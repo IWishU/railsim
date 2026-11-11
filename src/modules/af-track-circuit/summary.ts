@@ -2,7 +2,7 @@ import __html from "./views/summary.html?raw";
 
 /* 5페이지: 최종 정리 — 폐색 전체를 한 장으로.
    느린 앞 열차가 A역에 설 때마다 빠른 뒤 열차가 따라붙고, 신호(3현시)가 간격을 지키는 모습 위에
-   ①~④에서 배운 요소(중계·주파수·동조구간·임피던스본드)를 겹쳐 보여 준다. */
+   ①~④에서 배운 요소(중계·주파수·동조구간·B2본드)를 겹쳐 보여 준다. */
 
 const NS = "http://www.w3.org/2000/svg";
 type Attrs = Record<string, string | number>;
