@@ -2,7 +2,7 @@
 import { koAf } from "./ko.af";
 
 export const ko = {
-  "app.name": "RailSim",
+  "app.name": "Rail-Simulator",
   "app.tagline": "철도 기술과 설비를 눈으로 보고 만져서 배우는 시뮬레이터",
   "app.skip": "본문으로 건너뛰기",
   "app.footer": "교육용 자료입니다. AF궤도회로 내용은 한국철도공사 유지보수 표준화 매뉴얼 등을 바탕으로 하며, 실제 설비 작업은 최신 매뉴얼과 현장 규정을 따르세요.",
