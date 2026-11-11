@@ -4,6 +4,7 @@ import { mountSim } from "./sim";
 import { mountWhy } from "./why";
 import { mountLines } from "./lines";
 import { mountBond } from "./bond";
+import { mountSummary } from "./summary";
 
 export const afTrackCircuit: RailModule = {
   id: "af-track-circuit",
