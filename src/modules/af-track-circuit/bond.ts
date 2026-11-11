@@ -100,7 +100,7 @@ export function mountBond(root: HTMLElement): () => void {
   T(fluxRet, "상쇄", { x: -56, y: -74, "text-anchor": "middle", class: "sm", fill: RET, "font-weight": 700 });
   const fluxSig = mk(gBond, "g", {});
   arrow(fluxSig, -92, -62, -4, SIG); arrow(fluxSig, -92, 4, 62, SIG);
-  T(fluxSig, "합쳐짐", { x: -100, y: 92, "text-anchor": "middle", class: "sm", fill: SIG, "font-weight": 700 });
+  T(fluxSig, "합쳐짐", { x: -100, y: -74, "text-anchor": "middle", class: "sm", fill: SIG, "font-weight": 700 });
 
   T(svg, "중성점 (센터탭)", { x: BX + 16, y: CY - 10, class: "sm", "font-weight": 600 });
   const bondName = T(svg, "", { x: BX + 16, y: CY + 36, "font-size": 16, "font-weight": 700, fill: RET });
