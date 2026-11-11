@@ -99,7 +99,7 @@ export function mountSummary(root: HTMLElement): () => void {
     T(gFreq, `${sec.f} ${sec.hz.toLocaleString()}Hz`, { x: cx, y: 238, "text-anchor": "middle", "font-size": 12, "font-weight": 700, fill: `var(--f${sec.f})` });
   });
 
-  // 경계 장비(겹쳐 보기 ③·④): 동조구간 + 튜닝유니트 + 임피던스본드
+  // 경계 장비(겹쳐 보기 ③·④): 동조구간 + 튜닝유니트 + B2본드
   const gEq = mk(svg, "g", { visibility: "hidden" });
   [BW, BW * 2, CUT, BW * 3].forEach(t => {
     const x = X0 + t;
