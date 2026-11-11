@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"$CLAUDE_PROJECT_DIR\" && git add -A && { git diff --cached --quiet || { git commit -q -m \"auto: update via Claude Code\" -m \"Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\" && git push -q origin main; }; } 2>/dev/null || true",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && git add -A && { git diff --cached --quiet || { git commit -q -m \"auto: update via Claude Code\" -m \"Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>\" && git push -q origin main; }; } 2>/dev/null || true",
             "timeout": 60,
             "statusMessage": "자동 커밋/푸시 중..."
           }
