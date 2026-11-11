@@ -121,3 +121,14 @@
 .af .wave, .af .ring, .af .glow {animation:none}
 .af .ring {opacity:.35}
 }
+
+/* 4페이지: 임피던스본드 */
+.af .bflow {fill:none;stroke-width:4;stroke-dasharray:10 9;stroke-linecap:round;animation:run .6s linear infinite}
+.af .bflow.ret {stroke:var(--relay)}
+.af .bflow.sig {stroke:var(--flow)}
+.af .bflow.dim {opacity:.35}
+@media (max-width: 640px) {
+  .af #bondSvg {min-width:720px}
+  .af #bzSvg {min-width:600px}
+}
+@media (prefers-reduced-motion: reduce) { .af .bflow {animation:none} }
