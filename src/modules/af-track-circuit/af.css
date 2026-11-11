@@ -132,3 +132,21 @@
   .af #bzSvg {min-width:600px}
 }
 @media (prefers-reduced-motion: reduce) { .af .bflow {animation:none} }
+
+/* 5페이지: 최종 정리 */
+.af .chain {list-style:none;display:flex;flex-wrap:wrap;gap:14px 26px;padding:0;margin:12px 0 0}
+.af .chain li {position:relative;display:flex;align-items:center;padding:8px 15px;border-radius:99px;border:1.5px solid var(--line);background:var(--bg);font-size:.88rem;font-weight:600;color:var(--muted);transition:background .2s,border-color .2s,color .2s}
+.af .chain li.on {border-color:var(--accent);background:var(--accent);color:#fff}
+.af .chain li.on.stop {border-color:var(--occ);background:var(--occ)}
+.af .chain li:not(:last-child)::after {content:"→";position:absolute;right:-21px;color:var(--muted);font-weight:700}
+.af .recap {list-style:none;padding:0;margin:0;display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(172px,1fr))}
+.af .recap li {margin:0}
+.af .recap a {display:flex;flex-direction:column;gap:6px;height:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);text-decoration:none;font-size:.88rem}
+.af .recap a:hover {border-color:var(--accent)}
+.af .recap a span {color:var(--muted)}
+.af .recap b {font-size:.95rem}
+.af .recap .go {color:var(--accent) !important;font-weight:700;margin-top:auto}
+.af .legend {display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:.8rem;color:var(--muted)}
+.af .legend span {display:inline-flex;align-items:center;gap:5px}
+.af .legend i {display:inline-block;width:10px;height:10px;border-radius:3px}
+@media (max-width:640px) { .af #blockAll {min-width:780px} }
