@@ -1,0 +1,98 @@
+  <h1>AF궤도회로 시뮬레이터</h1>
+  <p class="sub">열차가 구간에 들어오면 궤도회로가 어떻게 ‘점유’를 감지하고 신호가 바뀌는지, 그리고 길게 나눈 30AT·30BT가 <b>중계궤도</b>로 어떻게 하나처럼 묶이는지 직접 확인해 보세요.</p>
+
+  <section class="card">
+    <div class="scroll"><svg id="track" viewBox="0 0 1000 260" role="img" aria-label="10T, 20T, 30AT, 30BT 구간과 중계 접점, 이동하는 열차"></svg></div>
+
+    <div class="posrow"><span>열차 위치</span><input id="pos" type="range" min="0" max="1000" step="1" value="0" aria-label="열차 위치"></div>
+
+    <div class="controls">
+      <button id="play" class="primary">▶ 운행 시작</button>
+      <button id="reset">↺ 처음으로</button>
+      <button id="atStop">30AT에 세우기</button>
+      <button id="btStop">30BT에 세우기</button>
+      <label class="speed">속도 <input id="speed" type="range" min="0.5" max="3" step="0.5" value="1"></label>
+      <span class="group">회로 구성</span>
+      <button id="mode" class="mode" aria-pressed="true">🔗 중계 연결 켜짐</button>
+      <span class="group">고장 넣어 보기</span>
+      <button id="fRail" class="fault" aria-pressed="false">⚡ 20T 레일 고장</button>
+      <button id="fBT" class="fault" aria-pressed="false">⚡ 30BT 송신 고장</button>
+      <button id="fWire" class="fault" aria-pressed="false">⚡ 중계 배선 단선</button>
+      <button id="fTPR" class="fault" aria-pressed="false">⚡ 30AT TPR 회로 단선</button>
+    </div>
+    <div class="status" id="status" aria-live="polite">‘운행 시작’을 눌러 보세요.</div>
+
+    <div class="grid" id="cards"></div>
+  </section>
+
+  <h2>계전기실 · 연동 · 표시</h2>
+  <section class="card">
+    <div class="scroll"><svg id="room" viewBox="0 0 1000 300" role="img" aria-label="현장 TR이 계전기실 TPR, 연동논리부, 표시제어부와 광통신부를 거쳐 표시 화면으로 이어지는 흐름"></svg></div>
+    <p class="meta" style="margin:8px 0 0">현장 TR이 붙어 있을 때만 B24V가 TR 접점을 지나 계전기실 TPR로 갑니다. 연동은 TPR 접점을 읽고 신호와 표시에 반영합니다.</p>
+  </section>
+
+  <h2>무슨 일이 일어나나요?</h2>
+  <section class="card">
+    <ol>
+      <li><b>송신기(TX)</b>가 구간마다 정해진 주파수의 신호 전류를 레일에 흘립니다. 이웃 구간은 A형(1,699Hz)·B형(2,296Hz)을 번갈아 씁니다.</li>
+      <li>구간 반대쪽 <b>수신기(RX)</b>가 그 신호를 받으면 “비어 있음(비점유)”으로 판단하고 <b>궤도계전기(TR)</b>가 여자됩니다.</li>
+      <li>열차가 들어오면 <b>차축이 두 레일을 이어</b>(단락) 전류가 수신기까지 가지 못합니다.</li>
+      <li>수신 레벨이 떨어지면 <b>TR이 낙하</b>하고 구간은 “점유”가 됩니다.</li>
+      <li>TR의 상태는 계전기실의 <b>TPR</b>이 그대로 따라 하고, <b>연동</b>은 TPR 접점을 읽어 표시와 신호를 바꿉니다.</li>
+      <li>점유 정보에 따라 <b>뒤쪽 신호기가 정지(적색)·주의(황색)</b>로 바뀌어 추돌을 막습니다.</li>
+    </ol>
+  </section>
+
+  <h2>중계궤도는?</h2>
+  <section class="two">
+    <div class="card bulb">
+      <p><b>전구 하나로 생각하면 됩니다.</b> 30AT 송신이 건전지, 30AT TR이 전구입니다. 전선 중간에 스위치 두 개가 한 줄로 달려 있습니다.</p>
+      <p>① <b>30AT 레일</b> — 30AT에 열차가 오면 끊김<br>② <b>30BT 접점</b> — 30BT에 열차가 오면 끊김</p>
+      <p style="margin:0">둘 중 하나만 끊겨도 전구가 꺼집니다. 그래서 <b>30AT는 30A·30B 어디가 점유돼도 낙하</b>합니다. 레일은 길어서 둘로 나눴지만, 30AT 하나만 보면 두 토막이 다 비었는지 알 수 있습니다.</p>
+    </div>
+    <div class="card bulb">
+      <p><b>외울 것 세 줄</b></p>
+      <ol>
+        <li>30AT 송신선에 30BT 접점이 들어 있다.</li>
+        <li>30A·30B 어디가 점유돼도 30AT가 떨어진다.</li>
+        <li>30AT가 떨어져 있으면 30BT부터 본다.</li>
+      </ol>
+      <p class="def">국제 표준 IEC 60050-821(821-03-26) “cut section of track circuit”: 옆 궤도회로 계전기의 여자 접점을 통해 전원을 받는 궤도회로. 30BT 경계에는 신호기가 없습니다(미국 49 CFR §236.736: 신호기 위치가 아닌 곳의 궤도회로 경계).</p>
+    </div>
+  </section>
+
+  <h2>고장이 나면?</h2>
+  <section class="card">
+    <p style="margin:0 0 10px">고장 버튼을 눌러 보세요. 어떤 고장이든 결과는 <b>점유·정지</b> 쪽입니다. 고장이 나도 안전한 쪽으로 동작하는 것을 <b>페일세이프(Fail-safe)</b>라고 합니다.</p>
+    <details>
+      <summary>30AT 점검값 보기 (예시값)</summary>
+      <table>
+        <thead><tr><th>측정 위치</th><th>값</th><th>기준</th></tr></thead>
+        <tbody>
+          <tr><td>30AT 송신 출력</td><td class="v" id="mTx"></td><td class="meta">6.8~13.2V</td></tr>
+          <tr><td>30AT TU 입력 (4·5번)</td><td class="v" id="mTU"></td><td class="meta">기록값 대비</td></tr>
+          <tr><td>30AT 수신 입력</td><td class="v" id="mRx"></td><td class="meta">15mA 이상</td></tr>
+          <tr><td>30AT TR 전압</td><td class="v" id="mTR"></td><td class="meta">22.1~25.9V</td></tr>
+          <tr><td>30AT TPR 코일 (B24V)</td><td class="v" id="mTPR"></td><td class="meta">DC 24V</td></tr>
+        </tbody>
+      </table>
+      <p class="meta" style="margin:8px 0 0">30BT에 열차가 있을 때 TU 입력 0V는 정상입니다. 송신 출력은 정상인데 TU 입력이 없으면 30BT 접점이나 배선을 의심합니다.</p>
+    </details>
+  </section>
+
+  <h2>용어</h2>
+  <section class="card">
+    <dl>
+      <dt>AF</dt><dd>Audio Frequency, 사람이 들을 수 있는 대역의 주파수를 쓴다는 뜻</dd>
+      <dt>궤도회로</dt><dd>레일을 전기회로로 이용해 열차 위치를 감지하는 장치</dd>
+      <dt>점유 / 비점유</dt><dd>구간에 열차가 있음 / 없음</dd>
+      <dt>단락(Shunt)</dt><dd>열차 바퀴와 차축이 두 레일을 전기적으로 이어 주는 것</dd>
+      <dt>TR (궤도계전기)</dt><dd>현장에서 수신 결과에 따라 붙거나(여자) 떨어지는(낙하) 스위치</dd>
+      <dt>TPR</dt><dd>계전기실에서 TR의 상태를 그대로 따라 하는 계전기. 연동은 TPR 접점을 읽는다</dd>
+      <dt>중계궤도</dt><dd>옆 궤도(30BT) 계전기의 접점을 거쳐 송신하는 궤도(30AT). 두 구간을 하나처럼 묶는다</dd>
+      <dt>연동논리부 (EI)</dt><dd>궤도·신호 조건을 따져 신호와 표시를 정하는 장치</dd>
+      <dt>광통신부</dt><dd>연동의 정보를 광케이블로 다른 장치에 보내는 부분</dd>
+    </dl>
+  </section>
+
+  <p class="note">교육용 개념 모형입니다. 주파수는 TI21형 공칭주파수, 기준값은 AF궤도회로 유지보수 매뉴얼(K746-4-B207) 값이며, 측정값과 신호 현시, 30AT·30BT 결선과 표시 화면은 이해를 돕기 위한 예시로 실제 노선 설비와 다를 수 있습니다.</p>

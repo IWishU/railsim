@@ -1,0 +1,61 @@
+  <h1>중계궤도는 왜 쓰나요?</h1>
+  <p class="sub">한 줄 요약: <b>궤도회로는 짧게 나눠야 믿을 수 있는데, 신호기는 그 단위마다 세울 수 없어서, 나눈 궤도를 계전기 접점으로 다시 하나로 묶습니다.</b></p>
+
+  <h2 class="why"><span class="step">1</span>궤도회로 하나는 길게 못 뽑는다</h2>
+  <section class="card">
+    <div class="scroll"><svg id="lenSvg" viewBox="0 0 1000 250" role="img" aria-label="구간 길이에 따라 수신 신호가 약해지는 그래프"></svg></div>
+    <div class="controls">
+      <label class="ctrl">구간 길이 <input id="lenR" type="range" min="200" max="2000" step="50" value="800"> <b id="lenV">800 m</b></label>
+      <span class="group">도상(자갈) 상태</span>
+      <button class="mode ballast" data-b="good" aria-pressed="true">좋음</button>
+      <button class="mode ballast" data-b="mid" aria-pressed="false">보통</button>
+      <button class="mode ballast" data-b="bad" aria-pressed="false">나쁨 (더러움·습기)</button>
+    </div>
+    <div class="status" id="lenStatus" aria-live="polite"></div>
+    <p class="meta" style="margin:8px 0 0">레일에는 저항이 있고, 두 레일 사이 자갈을 통해 전류가 조금씩 샙니다. 그래서 멀어질수록 신호가 약해집니다. AF 한 구간은 보통 600~1,000m(매뉴얼)이고, 미국 자료는 약 1.2km 이하로 제한한다고 합니다. 곡선과 퍼센트는 이해를 돕기 위한 개념 모형입니다.</p>
+  </section>
+
+  <h2 class="why"><span class="step">2</span>신호기 간격은 궤도회로 길이와 따로 정해진다</h2>
+  <section class="card">
+    <div class="scroll"><svg id="blkSvg" viewBox="0 0 1000 270" role="img" aria-label="1,800m 폐색구간을 궤도회로 하나로 덮지 못해 30AT와 30BT로 나누는 그림"></svg></div>
+    <p style="margin:10px 0 0">신호기와 신호기 사이(폐색구간)의 길이는 열차가 멈추는 데 필요한 거리 같은 운전 조건으로 정해집니다. 그래서 폐색구간이 궤도회로 하나보다 길어질 수 있습니다. 레일은 둘로 나눠야 하는데, <b>나눈 지점에는 신호기가 없습니다.</b></p>
+    <p class="def">미국 49 CFR §236.736 Cut-section: 폐색구간 안에서, 신호기 위치가 아닌 곳에 두 궤도회로의 경계가 있는 지점.</p>
+  </section>
+
+  <h2 class="why"><span class="step">3</span>나눈 두 궤도를 하나로 묶는 것이 중계</h2>
+  <section class="two">
+    <div class="card">
+      <h3 style="margin:0 0 6px;font-size:1rem">중계 없이 나누기만 하면</h3>
+      <svg id="cmpA" viewBox="0 0 480 290" role="img" aria-label="중계 없이 연동이 30AT와 30BT를 따로 읽는 그림"></svg>
+      <div class="count">2<small>연동이 확인할 궤도 조건</small></div>
+      <p class="meta" style="margin:4px 0 0">30BT 상태를 신호기 쪽으로 따로 전해야 합니다.</p>
+    </div>
+    <div class="card" style="border-color:var(--relay)">
+      <h3 style="margin:0 0 6px;font-size:1rem">중계로 묶으면</h3>
+      <svg id="cmpB" viewBox="0 0 480 290" role="img" aria-label="30BT 접점이 30AT 송신을 끊어 30AT 하나로 두 구간을 대표하는 그림"></svg>
+      <div class="count" style="color:var(--relay)">1<small>30AT 하나만 보면 됨</small></div>
+      <p class="meta" style="margin:4px 0 0">30BT 상태가 접점을 통해 30AT로 넘어옵니다.</p>
+    </div>
+  </section>
+  <section class="card" style="margin-top:10px">
+    <ul class="benefits">
+      <li><span class="tag src">근거</span><b>30AT 하나로 30A·30B 전체를 판단합니다.</b> 계전기 접점 논리로 둘 이상의 cut section을 하나의 신호 블록으로 합칩니다(미국 궤도검지 자료).</li>
+      <li><span class="tag src">근거</span><b>표준 정의와 같습니다.</b> IEC 60050-821(821-03-26): 옆 궤도회로 계전기의 여자 접점을 통해 전원을 받는 궤도회로.</li>
+      <li><span class="tag int">해석</span><b>30BT 상태를 따로 보낼 회로가 줄어듭니다.</b> 궤도회로 자체가 상태를 넘겨주므로, 연동이 볼 조건도 하나로 줄어듭니다.</li>
+      <li><span class="tag int">해석</span><b>고장도 안전한 쪽입니다.</b> 30BT 쪽 어디가 고장 나도 접점이 열려 30AT까지 낙하하므로 결과는 정지입니다.</li>
+    </ul>
+  </section>
+
+  <h2 class="why"><span class="step">4</span>한계: 한 방향 선로에 맞다</h2>
+  <section class="card">
+    <div class="scroll"><svg id="dirSvg" viewBox="0 0 1000 120" role="img" aria-label="열차 진행 방향이 한쪽으로 정해진 구조"></svg></div>
+    <p style="margin:8px 0 0">30BT가 30AT의 송신을 끊는 방향이 정해져 있고, 30AT 입구 신호기 하나가 두 구간을 지킵니다. 그래서 이 방식은 열차가 한 방향으로만 다니는 선로에 맞습니다(영문 위키백과). 양방향 운행 구간은 현장 설계를 확인해야 합니다.</p>
+  </section>
+
+  <h2>발표에서 이렇게 말하면 됩니다</h2>
+  <section class="card">
+    <p class="say">“궤도회로는 길이 한계 때문에 나눠야 하지만, 신호기는 폐색구간 단위로 하나라서, 나눈 궤도를 계전기 접점으로 다시 하나로 묶습니다. 그게 중계궤도입니다.”</p>
+    <a class="btnlink" href="#/m/af-track-circuit">① 시뮬레이터에서 직접 확인하기 →</a>
+  </section>
+
+  <p class="note">근거: 한국철도공사 AF궤도회로장치 유지보수 매뉴얼(K746-4-B207), IEC 60050-821, 미국 49 CFR §236.736·§236.737, JLC Enterprises “Track Occupancy Detection Fundamentals”, 영문 위키백과 “Track circuit”. 국내 매뉴얼에는 중계를 쓰는 이유가 직접 적혀 있지 않아, ‘해석’ 표시 항목은 회로 원리로 풀어 쓴 내용입니다. 폐색구간 1,800m와 그래프 수치는 예시입니다.</p>

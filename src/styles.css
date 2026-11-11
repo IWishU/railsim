@@ -1,0 +1,73 @@
+:root {
+  --bg: #f4f6f5; --card: #ffffff; --ink: #1b2320; --muted: #5a6661; --line: #d8dedb;
+  --rail: #6b7570; --free: #2f8f5b; --occ: #c8412f; --warn: #d49a1a; --accent: #1f6f8b;
+  --hero-a: #1f6f8b; --hero-b: #16485c;
+  --radius: 14px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101412; --card: #1a201d; --ink: #e6ebe8; --muted: #9aa5a0; --line: #2c3531;
+    --rail: #8a948f; --free: #4cbf80; --occ: #ef6a55; --warn: #e8b33a; --accent: #5bb3d1;
+    --hero-a: #1d4d5e; --hero-b: #12303b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101412; --card: #1a201d; --ink: #e6ebe8; --muted: #9aa5a0; --line: #2c3531;
+  --rail: #8a948f; --free: #4cbf80; --occ: #ef6a55; --warn: #e8b33a; --accent: #5bb3d1;
+  --hero-a: #1d4d5e; --hero-b: #12303b;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); line-height: 1.6;
+  font-family: system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+}
+a { color: var(--accent); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: absolute; left: -999px; top: 0; background: var(--card); padding: 8px 12px; z-index: 10; }
+.skip:focus { left: 8px; top: 8px; }
+
+/* 레이아웃 */
+.site-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px max(16px, env(safe-area-inset-left)); border-bottom: 1px solid var(--line);
+  background: var(--card); position: sticky; top: 0; z-index: 5;
+}
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.15rem; color: var(--ink); text-decoration: none; }
+.tools { display: flex; gap: 8px; }
+select { font: inherit; font-size: .9rem; padding: 7px 8px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); min-height: 40px; }
+main { max-width: 960px; margin: 0 auto; padding: 20px 16px 48px; outline: none; }
+.site-footer { max-width: 960px; margin: 0 auto; padding: 0 16px 32px; color: var(--muted); font-size: .8rem; }
+
+h1 { font-size: 1.5rem; margin: 0 0 6px; line-height: 1.3; }
+h2 { font-size: 1.1rem; margin: 28px 0 10px; }
+.lead { color: var(--muted); margin: 0 0 18px; }
+.back { display: inline-block; margin-bottom: 12px; text-decoration: none; font-size: .95rem; }
+
+/* 홈 */
+.hero { background: linear-gradient(135deg, var(--hero-a), var(--hero-b)); color: #fff; border-radius: 18px; padding: 28px 22px; margin-bottom: 22px; }
+.hero h1 { font-size: 1.8rem; }
+.hero .lead { color: rgba(255, 255, 255, .85); margin: 0; }
+.module-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.module-card { display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); color: var(--ink); text-decoration: none; transition: transform .15s, border-color .15s; }
+a.module-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.module-card strong { font-size: 1.1rem; }
+.module-card span { color: var(--muted); font-size: .92rem; }
+.module-card .go { color: var(--accent); font-weight: 600; margin-top: auto; }
+.module-card.soon { opacity: .6; border-style: dashed; }
+.module-card .tag { align-self: flex-start; font-size: .72rem !important; padding: 2px 9px; border-radius: 99px; background: var(--bg); border: 1px solid var(--line); }
+
+/* 공통 */
+@media (max-width: 640px) { .hero h1 { font-size: 1.5rem; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* 페이지 이동 바 */
+.pager { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 14px; }
+.pager a { text-decoration: none; font-weight: 600; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); min-height: 44px; display: inline-flex; align-items: center; }
+.pager a.next { background: var(--accent); border-color: var(--accent); color: #fff; }
+.pager:last-child { margin: 28px 0 0; }

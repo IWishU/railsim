@@ -1,0 +1,123 @@
+/* AF궤도회로 모듈 전용 스타일. 전부 .af 안에서만 적용되어 사이트 다른 화면과 섞이지 않습니다.
+   기본 색(--bg --card --ink ...)은 사이트 공통 값을 쓰고, 여기서는 이 모듈에만 필요한 색을 더합니다. */
+.af { --relay: #b8661a; --flow: #1f6f8b; --board: #16201c; --board-off: #4b5a54; --board-ink: #c9d3ce;
+  --fA: #2b6cb0; --fB: #d97706; --fC: #7c3aed; --fD: #0f766e; --fE: #be185d; --fF: #4d7c0f; --fG: #9a3412; --fH: #64748b; --zone: #e8892a; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .af { --relay: #e8a050; --flow: #5bb3d1; --board: #0b0f0d; --board-off: #3d4a44;
+    --fA: #6ea8ff; --fB: #f5a524; --fC: #b794f6; --fD: #3cc8b4; --fE: #f472b6; --fF: #a3c95a; --fG: #f0905a; --fH: #a4b2c6; --zone: #f0a050; }
+}
+:root[data-theme="dark"] .af { --relay: #e8a050; --flow: #5bb3d1; --board: #0b0f0d; --board-off: #3d4a44;
+  --fA: #6ea8ff; --fB: #f5a524; --fC: #b794f6; --fD: #3cc8b4; --fE: #f472b6; --fF: #a3c95a; --fG: #f0905a; --fH: #a4b2c6; --zone: #f0a050; }
+
+.af .sub {color:var(--muted);margin:0 0 18px;font-size:.95rem}
+.af .card {background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}
+.af svg {width:100%;height:auto;display:block}
+.af .scroll {overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media (max-width:640px) {
+.af #track, .af #room {min-width:640px}
+}
+.af .controls {display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
+.af button {font:inherit;font-size:.95rem;padding:9px 14px;border-radius:10px;border:1px solid var(--line);
+    background:var(--card);color:var(--ink);cursor:pointer;min-height:42px}
+.af button:focus-visible, .af input:focus-visible {outline:2px solid var(--accent);outline-offset:2px}
+.af button.primary {background:var(--accent);border-color:var(--accent);color:#fff}
+.af button.fault[aria-pressed="true"] {background:var(--occ);border-color:var(--occ);color:#fff}
+.af button.mode[aria-pressed="true"] {background:var(--accent);border-color:var(--accent);color:#fff}
+.af label.speed {display:flex;align-items:center;gap:8px;font-size:.9rem;color:var(--muted);margin-left:auto}
+.af input[type=range] {accent-color:var(--accent)}
+.af .posrow {display:flex;align-items:center;gap:10px;margin-top:12px;font-size:.9rem;color:var(--muted)}
+.af .posrow input {flex:1;min-width:0}
+.af .group {font-size:.8rem;font-weight:600;color:var(--muted);width:100%;margin-top:6px}
+.af .status {margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--bg);font-size:.95rem}
+.af .status b {color:var(--relay)}
+.af .grid {display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+@media (max-width:640px) {
+.af .grid {grid-template-columns:repeat(2,1fr)}
+.af label.speed {margin-left:0;width:100%}
+}
+.af .sec h3 {margin:0 0 4px;font-size:1rem;display:flex;justify-content:space-between;align-items:center}
+.af .badge {font-size:.75rem;padding:2px 8px;border-radius:99px;color:#fff;background:var(--free)}
+.af .badge.occ {background:var(--occ)}
+.af .meta {font-size:.82rem;color:var(--muted)}
+.af .meta.relay {color:var(--relay);font-weight:600}
+.af .bar {height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin:6px 0 2px}
+.af .bar>i {display:block;height:100%;background:var(--free);transition:width .2s}
+.af .bar.low>i {background:var(--occ)}
+.af .sec.relayed {border-color:var(--relay)}
+.af h2 {font-size:1.1rem;margin:26px 0 10px}
+.af ol {padding-left:1.2em;margin:0}
+.af ol li {margin-bottom:6px}
+.af dl {margin:0;display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;font-size:.93rem}
+.af dt {font-weight:600}
+.af dd {margin:0;color:var(--muted)}
+.af .note {font-size:.8rem;color:var(--muted);margin-top:22px}
+.af .two {display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:640px) {
+.af .two {grid-template-columns:1fr}
+}
+.af .bulb {font-size:.95rem}
+.af .bulb p {margin:0 0 8px}
+.af table {width:100%;border-collapse:collapse;font-size:.9rem}
+.af th, .af td {text-align:left;padding:6px 4px;border-bottom:1px solid var(--line)}
+.af th {font-size:.8rem;color:var(--muted);font-weight:600}
+.af td.v {font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+.af details summary {cursor:pointer;font-weight:600;font-size:.93rem}
+.af details[open] summary {margin-bottom:8px}
+.af .def {font-size:.85rem;color:var(--muted);border-left:3px solid var(--line);padding-left:10px;margin-top:8px}
+.af .lbl {font-size:16px;font-weight:600}
+.af .sm {font-size:13px}
+.af .flow {fill:none;stroke:var(--flow);stroke-width:4;stroke-dasharray:10 9;stroke-linecap:round;animation:run .6s linear infinite}
+@keyframes run {to{stroke-dashoffset:19}}
+.af .wire {fill:none;stroke:currentColor;stroke-width:2}
+.af .ctl {fill:none;stroke:var(--relay);stroke-width:1.6;stroke-dasharray:5 4}
+.af .blade {stroke-width:3.5;stroke-linecap:round}
+@media (prefers-reduced-motion: reduce) {
+.af .flow {animation:none}
+.af .bar>i {transition:none}
+}
+.af .step {display:inline-flex;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-size:.9rem;align-items:center;justify-content:center;margin-right:8px;flex:none}
+.af h2.why {display:flex;align-items:center}
+.af label.ctrl {display:flex;align-items:center;gap:10px;font-size:.9rem;color:var(--muted);flex:1;min-width:240px}
+.af label.ctrl input {flex:1;min-width:0}
+.af label.ctrl b {color:var(--ink);font-variant-numeric:tabular-nums;min-width:64px;text-align:right}
+.af .status.ok {border-left:4px solid var(--free)}
+.af .status.bad {border-left:4px solid var(--occ)}
+.af .count {font-size:2rem;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.af .count small {font-size:.85rem;font-weight:600;color:var(--muted);margin-left:6px}
+.af .tag {display:inline-block;font-size:.72rem;font-weight:700;padding:1px 7px;border-radius:99px;margin-right:6px;vertical-align:1px}
+.af .tag.src {background:var(--free);color:#fff}
+.af .tag.int {background:var(--relay);color:#fff}
+.af .benefits {list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.af .say {font-size:1.05rem;font-weight:600;border-left:4px solid var(--accent);padding:6px 12px;margin:0 0 12px}
+.af a.btnlink {display:inline-block;font-weight:600;text-decoration:none;color:#fff;background:var(--accent);padding:9px 14px;border-radius:10px}
+@media (max-width:640px) {
+.af #lenSvg, .af #blkSvg {min-width:600px}
+}
+.af .wave {fill:none;stroke-width:2.6;stroke-linecap:round;stroke-dasharray:14 8;animation:wavego var(--dur,1s) linear infinite}
+.af .wave.rev {animation-direction:reverse}
+@keyframes wavego {to{stroke-dashoffset:-22}}
+.af .seghit {cursor:pointer}
+.af .seghit:focus-visible {outline:none}
+.af .seghit:focus-visible rect.band, .af .seghit.sel rect.band {stroke:currentColor;stroke-width:2}
+.af .chips {display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.af .chip {display:inline-flex;align-items:center;gap:6px;font-size:.82rem;padding:3px 9px;border-radius:99px;border:1px solid var(--line);background:var(--card)}
+.af .chip i {width:10px;height:10px;border-radius:50%;display:inline-block}
+.af .chip.off {opacity:.35}
+.af .info {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+@media (max-width:640px) {
+.af .info {grid-template-columns:repeat(2,minmax(0,1fr))}
+.af #lineSvg {min-width:700px}
+.af #zoomSvg {min-width:560px}
+}
+.af .info div {background:var(--bg);border-radius:10px;padding:8px 10px;min-width:0}
+.af .info small {display:block;font-size:.75rem;color:var(--muted)}
+.af .info b {font-size:1.05rem;font-variant-numeric:tabular-nums}
+.af .ring {transform-box:fill-box;transform-origin:center;animation:ring 1.8s ease-out infinite}
+.af .ring.d2 {animation-delay:.9s}
+@keyframes ring {from{transform:scale(.35);opacity:.75}to{transform:scale(1.7);opacity:0}}
+.af .glow {animation:glow 1.8s ease-in-out infinite}
+@keyframes glow {50%{opacity:.25}}
+@media (prefers-reduced-motion: reduce) {
+.af .wave, .af .ring, .af .glow {animation:none}
+.af .ring {opacity:.35}
+}

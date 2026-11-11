@@ -1,0 +1,63 @@
+  <h1>상선·하선 주파수 배치</h1>
+  <p class="sub">AF궤도회로는 선로마다 주파수 한 쌍을 정해 두고, 구간마다 번갈아 씁니다. 이웃 구간 사이 20m 동조구간에서 튜닝유니트가 두 주파수를 갈라 줍니다. 구간을 눌러 자세히 보세요.</p>
+
+  <section class="card">
+    <div class="controls" style="margin-top:0">
+      <button class="mode lay" data-lay="2" aria-pressed="true">복선 (상선·하선)</button>
+      <button class="mode lay" data-lay="4" aria-pressed="false">복복선 (4선)</button>
+      <button id="waveBtn" aria-pressed="true">〰 주파수 흐름 켜짐</button>
+    </div>
+    <div class="scroll" style="margin-top:10px"><svg id="lineSvg" viewBox="0 0 1000 260" role="img" aria-label="선로별 궤도회로 구간과 공칭주파수, 튜닝유니트, 동조구간 배치"></svg></div>
+    <div class="chips" id="chips"></div>
+    <div class="info" id="info" aria-live="polite"></div>
+    <p class="meta" style="margin:10px 0 0">동조구간(20m)은 잘 보이도록 실제보다 넓게 그렸습니다. 구간 길이는 600~1,000m 안에서 고른 예시이고, 흐르는 물결은 주파수를 눈으로 보이게 한 표현입니다(주파수가 높을수록 촘촘하고 빠르게).</p>
+  </section>
+
+  <h2>동조구간 확대 — 공진으로 두 주파수가 갈리는 20m</h2>
+  <section class="card">
+    <div class="scroll"><svg id="zoomSvg" viewBox="0 0 1000 330" role="img" aria-label="튜닝유니트의 공진 곡선과, 동조구간에서 A 주파수와 B 주파수가 서로 막혀 사라지는 그림"></svg></div>
+    <p style="margin:8px 0 0">튜닝유니트는 <b>공진</b>을 이용합니다. 라디오가 채널을 맞추면 그 방송만 또렷해지듯, 튜닝유니트는 자기 구간 주파수에서 가장 크게 반응하고(위 곡선의 봉우리), 다른 주파수에는 거의 반응하지 않습니다.</p>
+    <p style="margin:8px 0 0">그래서 A 신호는 동조구간을 지나며 약해지다가 B쪽 튜닝유니트 앞에서 막히고, B 신호도 A쪽 튜닝유니트 앞에서 막힙니다. 두 튜닝유니트 사이 <b>20m(±0.5m)</b>가 동조구간(전기적 분리 이음매)이고, 레일을 자르지 않고도 구간이 나뉘는 이유입니다.</p>
+    <p class="meta" style="margin:8px 0 0">공진 곡선의 모양과 물결이 줄어드는 모습은 원리를 보여 주기 위한 개념 표현입니다. 실제 튜닝유니트의 내부 회로와 특성값은 제조사 자료를 따릅니다.</p>
+  </section>
+
+  <h2>설명</h2>
+  <section class="two">
+    <div class="card">
+      <h3 style="margin:0 0 8px;font-size:1rem">공칭주파수 8종 (TI21형)</h3>
+      <table>
+        <thead><tr><th>선로</th><th>유형</th><th>공칭주파수</th></tr></thead>
+        <tbody>
+          <tr><td>하선 →</td><td>A · B</td><td class="v">1,699 · 2,296 Hz</td></tr>
+          <tr><td>상선 ←</td><td>C · D</td><td class="v">1,996 · 2,593 Hz</td></tr>
+          <tr><td>복복선 추가 →</td><td>E · F</td><td class="v">1,549 · 2,146 Hz</td></tr>
+          <tr><td>복복선 추가 ←</td><td>G · H</td><td class="v">1,848 · 2,445 Hz</td></tr>
+        </tbody>
+      </table>
+      <p class="meta" style="margin:8px 0 0">8종 모두 1,549~2,593Hz 안에 있습니다. 화살표 방향은 매뉴얼 주파수 분할도를 따랐습니다.</p>
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 8px;font-size:1rem">왜 이렇게 배치하나요?</h3>
+      <ul class="benefits">
+        <li><b>이웃 구간은 다른 주파수</b> — A → B → A → B처럼 번갈아 쓰면 붙어 있는 두 구간이 섞이지 않습니다. 수신기는 라디오 채널처럼 자기 주파수만 듣습니다.</li>
+        <li><b>선로마다 다른 쌍</b> — 하선은 A·B, 상선은 C·D를 써서 나란히 놓인 선로끼리도 같은 주파수가 겹치지 않습니다. 복복선은 E·F, G·H까지 씁니다.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 8px;font-size:1rem">튜닝유니트</h3>
+      <ul class="benefits">
+        <li>공진을 이용해 자기 주파수만 통과시키고, 구간을 전기적으로 나누는 이음매 역할을 합니다.</li>
+        <li>한 구간에 2대. 이웃 구간과 맞닿는 곳은 <b>일반형</b>, 구간이 끝나는 곳은 <b>종단형</b>을 씁니다.</li>
+        <li>단자: <b>1·2</b> 수신, <b>3</b> 접지, <b>4·5</b> 송신, <b>T1·T2</b> 레일.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 8px;font-size:1rem">구간 길이</h3>
+      <ul class="benefits">
+        <li>매뉴얼 구성도 기준 한 구간 <b>600~1,000m</b>, 이웃 구간과는 <b>20m</b> 동조구간.</li>
+        <li>정상 전력방식 <b>200~1,100m</b>, 짧은 구간용 저전력 방식 <b>50~250m</b>.</li>
+        <li>이보다 긴 구간은 나눠야 하고, 나눈 두 궤도를 묶을 때 중계궤도를 씁니다(② 페이지).</li>
+      </ul>
+    </div>
+  </section>
+  <p class="note">근거: 한국철도공사 AF궤도회로장치 유지보수 매뉴얼(K746-4-B207) 5.1 장치 설명·주파수 분할도·구성도. 그림의 구간 길이와 송신·수신 위치는 예시입니다.</p>
