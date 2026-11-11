@@ -105,7 +105,6 @@ export function mountBond(root: HTMLElement): () => void {
   T(svg, "중성점 (센터탭)", { x: BX + 16, y: CY - 10, class: "sm", "font-weight": 600 });
   const bondName = T(svg, "", { x: BX + 16, y: CY + 36, "font-size": 16, "font-weight": 700, fill: RET });
   T(svg, "두 레일에 걸쳐 단 코일", { x: BX + 16, y: CY + 56, class: "sm", opacity: 0.7 });
-  T(svg, "자속 = 철심 속 자기장", { x: BX - 130, y: LY - 22, class: "sm", opacity: 0.6, "text-anchor": "middle" });
 
   /* ---- 상태 ---- */
   let mode: Mode = "both", size: "B1" | "B2" = "B2", fault = false;
