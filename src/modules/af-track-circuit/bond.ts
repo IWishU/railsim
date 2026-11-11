@@ -132,7 +132,7 @@ export function mountBond(root: HTMLElement): () => void {
     const pass = mode === "both" ? "귀선 통과 · 신호 차단" : ret ? "귀선전류 통과" : "신호전류 차단";
     const z = mode === "both" ? "방향마다 다름" : ret ? "낮음 (자속 상쇄)" : "높음 (자속 합쳐짐)";
     info.innerHTML = `
-      <div><small>선택한 본드</small><b>${size} · ${size === "B1" ? "대형" : "소형"}</b></div>
+      <div><small>선택한 본드</small><b>${size}본드 · ${size === "B1" ? "대형" : "소형"}</b></div>
       <div><small>전류의 운명</small><b>${fault && ret ? "귀선이 갈 곳 없음" : pass}</b></div>
       <div><small>코일 임피던스</small><b>${z}</b></div>
       <div><small>중성점 접속</small><b style="color:var(--${fault ? "occ" : "free"})">${fault ? "풀림 (예시)" : "연결됨"}</b></div>`;
