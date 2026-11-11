@@ -1,0 +1,55 @@
+  <h1>최종 정리 — 폐색, 한 장으로 보기</h1>
+  <p class="sub">지금까지 배운 것을 전부 한 선로 위에 올렸습니다. <b>폐색은 선로를 구간으로 나눠, 한 구간에 열차 하나만 들이는 약속</b>입니다. 느린 앞 열차가 A역에 설 때마다 빠른 뒤 열차가 따라붙지만, 궤도회로가 열차를 찾고 신호기가 간격을 지켜 줍니다.</p>
+
+  <section class="card">
+    <div class="scroll"><svg id="blockAll" viewBox="0 0 1000 352" role="img" aria-label="폐색 4개 구간과 A역, 신호기 4기, 두 열차, 관제 표시를 한 화면에 담은 종합 시뮬레이션"></svg></div>
+    <div class="controls">
+      <button id="aPlay" class="primary">▶ 운행 시작</button>
+      <button id="aReset">↺ 처음으로</button>
+      <label class="speed">속도 <input id="aSpeed" type="range" min="0.5" max="3" step="0.5" value="1"></label>
+      <span class="group">겹쳐 보기</span>
+      <button id="layFreq" class="mode" aria-pressed="true">주파수 보기 (③)</button>
+      <button id="layEq" class="mode" aria-pressed="false">경계 장비 보기 (③·④)</button>
+      <span class="group">고장 넣어 보기</span>
+      <button id="aF2" class="fault" aria-pressed="false">⚡ 2T 레일 고장</button>
+      <button id="aFB" class="fault" aria-pressed="false">⚡ 3BT 송신 고장 (중계)</button>
+    </div>
+    <div class="legend" id="aLegend" hidden>
+      <span><i style="background:var(--zone)"></i>동조구간 20m (③)</span>
+      <span>▭▭ 튜닝유니트 2대 (③)</span>
+      <span><b style="color:var(--relay)">B</b> 임피던스본드 (④)</span>
+    </div>
+    <div class="status" id="aStatus" aria-live="polite">‘운행 시작’을 눌러 보세요.</div>
+    <div class="info" id="aInfo"></div>
+    <p class="meta" style="margin:10px 0 0">선로 끝은 처음으로 이어지는 순환 모형이고, 구간 길이·3현시 방식·역 위치는 이해를 돕기 위한 예시입니다. 폐색 ③은 길어서 3AT·3BT로 나눈 뒤 중계로 묶었고(②), 구간 경계마다 동조구간·튜닝유니트(③)와 임피던스본드(④)가 있습니다.</p>
+  </section>
+
+  <h2>일어나는 일, 한 줄로</h2>
+  <section class="card">
+    <ul class="chain" id="aChain">
+      <li data-k="shunt">차축이 레일을 단락</li>
+      <li data-k="tr">TR 낙하 = 점유</li>
+      <li data-k="tpr">TPR → 연동 전달</li>
+      <li data-k="sig">뒤 신호가 정지·주의</li>
+      <li data-k="train">뒤 열차 서행·정지</li>
+    </ul>
+    <p class="meta" style="margin:12px 0 0">운행 중 지금 일어나고 있는 단계에 불이 들어옵니다. 앞 세 칸은 열차가 선로 위에 있는 한 항상 켜져 있습니다.</p>
+  </section>
+
+  <h2>다섯 페이지 정리</h2>
+  <section class="card">
+    <ul class="recap">
+      <li><a href="#/m/af-track-circuit"><b>① 궤도회로</b><span>차축이 레일을 단락하면 수신이 끊겨 ‘점유’. 고장도 점유 쪽 — 페일세이프.</span><span class="go">다시 보기 →</span></a></li>
+      <li><a href="#/m/af-track-circuit/2"><b>② 중계궤도</b><span>길어서 둘로 나눈 궤도를 계전기 접점으로 다시 하나로 묶는다.</span><span class="go">다시 보기 →</span></a></li>
+      <li><a href="#/m/af-track-circuit/3"><b>③ 주파수 배치</b><span>이웃 구간은 다른 주파수, 경계는 20m 동조구간에서 공진으로 갈라진다.</span><span class="go">다시 보기 →</span></a></li>
+      <li><a href="#/m/af-track-circuit/4"><b>④ 임피던스본드</b><span>귀선전류는 통과시키고 신호전류는 막아, 신호를 구간 안에 가둔다.</span><span class="go">다시 보기 →</span></a></li>
+      <li><a href="#/m/af-track-circuit/5"><b>⑤ 폐색 (이 페이지)</b><span>한 구간에 열차 하나. 점유를 찾고, 신호로 뒤 열차를 세운다.</span><span class="go">지금 보고 있어요</span></a></li>
+    </ul>
+  </section>
+
+  <h2>발표에서 이렇게 말하면 됩니다</h2>
+  <section class="card">
+    <p class="say">“폐색은 선로를 구간으로 나눠 한 구간에 열차 하나만 들이는 약속입니다. 궤도회로가 열차를 찾고, 중계·주파수·임피던스본드가 그 판단을 믿을 수 있게 만들고, 신호기가 뒤 열차를 세웁니다. 고장이 나면 정지 쪽으로 — 그래서 안전합니다.”</p>
+  </section>
+
+  <p class="note">①~④ 페이지의 근거(한국철도공사 K746-4-B207, IEC 60050-821, 미국 49 CFR §236.736 등)를 종합한 정리 페이지입니다. 그림의 구간 수·길이·현시 방식·역 위치는 교육용 예시이며, 실제 노선의 폐색 방식과 현시 체계는 선로별 규정을 따릅니다.</p>
