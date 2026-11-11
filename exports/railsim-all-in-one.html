@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>Rail-Simulator</title>
+  <!-- 이 파일은 Rail-Simulator 사이트 전체(홈 + AF궤도회로 1~5페이지)를 하나로 묶은 독립 실행 파일입니다.
+       인터넷 연결이나 서버 없이 더블클릭만으로 브라우저에서 바로 열립니다. 배포 중인 사이트와는 별개의 사본입니다. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%86%3C/text%3E%3C/svg%3E">
+  <script type="module">
+(function(){const l=document.createElement("link").relList;if(l&&l.supports&&l.supports("modulepreload"))return;for(const e of document.querySelectorAll('link[rel="modulepreload"]'))C(e);new MutationObserver(e=>{for(const a of e)if(a.type==="childList")for(const d of a.addedNodes)d.tagName==="LINK"&&d.rel==="modulepreload"&&C(d)}).observe(document,{childList:!0,subtree:!0});function o(e){const a={};return e.integrity&&(a.integrity=e.integrity),e.referrerPolicy&&(a.referrerPolicy=e.referrerPolicy),e.crossOrigin==="use-credentials"?a.credentials="include":e.crossOrigin==="anonymous"?a.credentials="omit":a.credentials="same-origin",a}function C(e){if(e.ep)return;e.ep=!0;const a=o(e);fetch(e.href,a)}})();const Kt={"mod.af.title":"AF궤도회로","mod.af.desc":"레일 신호로 열차를 찾는 원리부터 중계궤도, 주파수 배치, 임피던스본드, 그리고 폐색 전체 정리까지 직접 조작하며 배워요.","mod.af.p1.title":"AF궤도회로 시뮬레이터","mod.af.p2.title":"중계궤도는 왜 쓰나요?","mod.af.p3.title":"상선·하선 주파수 배치","mod.af.p4.title":"임피던스본드 (B1·B2)","mod.af.p5.title":"최종 정리: 폐색 한 장으로 보기"},Yt={"app.name":"Rail-Simulator","app.tagline":"철도 기술과 설비를 눈으로 보고 만져서 배우는 시뮬레이터","app.skip":"본문으로 건너뛰기","app.footer":"교육용 자료입니다. AF궤도회로 내용은 한국철도공사 유지보수 표준화 매뉴얼 등을 바탕으로 하며, 실제 설비 작업은 최신 매뉴얼과 현장 규정을 따르세요.","nav.home":"처음으로","nav.language":"언어","nav.theme":"화면 모드","nav.next":"다음으로 →","nav.prev":"← 이전으로","nav.page":"{n} / {total}","theme.auto":"자동","theme.light":"밝게","theme.dark":"어둡게","home.title":"무엇을 배워볼까요?","home.lead":"각 주제는 직접 조작해 보는 시뮬레이션과 쉬운 설명으로 이루어져 있어요.","home.soon":"준비 중","home.open":"열기","home.level.beginner":"입문","home.level.intermediate":"중급","notfound.title":"페이지를 찾을 수 없어요","mod.signal.title":"신호와 폐색","mod.signal.desc":"구간을 나눠 한 번에 한 열차만 들어가게 하는 원리.","mod.switch.title":"분기기(선로전환기)","mod.switch.desc":"열차가 갈 길을 바꾸는 장치의 구조와 동작.","mod.power.title":"전차선과 급전","mod.power.desc":"전기가 변전소에서 열차까지 오는 길.",...Kt},Ht={ko:Yt},Gt=[{code:"ko",label:"한국어"}];let Vt="ko";function Ot(u){Vt=u,document.documentElement.lang=u}function X(u,l){let o=Ht[Vt][u]??Ht.ko[u]??u;if(l)for(const C in l)o=o.replaceAll(`{${C}}`,String(l[C]));return o}const jt=`  <h1>AF궤도회로 시뮬레이터</h1>
+  <p class="sub">열차가 구간에 들어오면 궤도회로가 어떻게 ‘점유’를 감지하고 신호가 바뀌는지, 그리고 길게 나눈 30AT·30BT가 <b>중계궤도</b>로 어떻게 하나처럼 묶이는지 직접 확인해 보세요.</p>
+
+  <section class="card">
+    <div class="scroll"><svg id="track" viewBox="0 0 1000 260" role="img" aria-label="10T, 20T, 30AT, 30BT 구간과 중계 접점, 이동하는 열차"></svg></div>
+
+    <div class="posrow"><span>열차 위치</span><input id="pos" type="range" min="0" max="1000" step="1" value="0" aria-label="열차 위치"></div>
+
+    <div class="controls">
+      <button id="play" class="primary">▶ 운행 시작</button>
+      <button id="reset">↺ 처음으로</button>
+      <button id="atStop">30AT에 세우기</button>
+      <button id="btStop">30BT에 세우기</button>
+      <label class="speed">속도 <input id="speed" type="range" min="0.5" max="3" step="0.5" value="1"></label>
+      <span class="group">회로 구성</span>
+      <button id="mode" class="mode" aria-pressed="true">🔗 중계 연결 켜짐</button>
+      <span class="group">고장 넣어 보기</span>
+      <button id="fRail" class="fault" aria-pressed="false">⚡ 20T 레일 고장</button>
+      <button id="fBT" class="fault" aria-pressed="false">⚡ 30BT 송신 고장</button>
+      <button id="fWire" class="fault" aria-pressed="false">⚡ 중계 배선 단선</button>
+      <button id="fTPR" class="fault" aria-pressed="false">⚡ 30AT TPR 회로 단선</button>
+    </div>
+    <div class="status" id="status" aria-live="polite">‘운행 시작’을 눌러 보세요.</div>
+
+    <div class="grid" id="cards"></div>
+  </section>
+
+  <h2>계전기실 · 연동 · 표시</h2>
+  <section class="card">
+    <div class="scroll"><svg id="room" viewBox="0 0 1000 300" role="img" aria-label="현장 TR이 계전기실 TPR, 연동논리부, 표시제어부와 광통신부를 거쳐 표시 화면으로 이어지는 흐름"></svg></div>
+    <p class="meta" style="margin:8px 0 0">현장 TR이 붙어 있을 때만 B24V가 TR 접점을 지나 계전기실 TPR로 갑니다. 연동은 TPR 접점을 읽고 신호와 표시에 반영합니다.</p>
+  </section>
+
+  <h2>무슨 일이 일어나나요?</h2>
+  <section class="card">
+    <ol>
+      <li><b>송신기(TX)</b>가 구간마다 정해진 주파수의 신호 전류를 레일에 흘립니다. 이웃 구간은 A형(1,699Hz)·B형(2,296Hz)을 번갈아 씁니다.</li>
+      <li>구간 반대쪽 <b>수신기(RX)</b>가 그 신호를 받으면 “비어 있음(비점유)”으로 판단하고 <b>궤도계전기(TR)</b>가 여자됩니다.</li>
+      <li>열차가 들어오면 <b>차축이 두 레일을 이어</b>(단락) 전류가 수신기까지 가지 못합니다.</li>
+      <li>수신 레벨이 떨어지면 <b>TR이 낙하</b>하고 구간은 “점유”가 됩니다.</li>
+      <li>TR의 상태는 계전기실의 <b>TPR</b>이 그대로 따라 하고, <b>연동</b>은 TPR 접점을 읽어 표시와 신호를 바꿉니다.</li>
+      <li>점유 정보에 따라 <b>뒤쪽 신호기가 정지(적색)·주의(황색)</b>로 바뀌어 추돌을 막습니다.</li>
+    </ol>
+  </section>
+
+  <h2>중계궤도는?</h2>
+  <section class="two">
+    <div class="card bulb">
+      <p><b>전구 하나로 생각하면 됩니다.</b> 30AT 송신이 건전지, 30AT TR이 전구입니다. 전선 중간에 스위치 두 개가 한 줄로 달려 있습니다.</p>
+      <p>① <b>30AT 레일</b> — 30AT에 열차가 오면 끊김<br>② <b>30BT 접점</b> — 30BT에 열차가 오면 끊김</p>
+      <p style="margin:0">둘 중 하나만 끊겨도 전구가 꺼집니다. 그래서 <b>30AT는 30A·30B 어디가 점유돼도 낙하</b>합니다. 레일은 길어서 둘로 나눴지만, 30AT 하나만 보면 두 토막이 다 비었는지 알 수 있습니다.</p>
+    </div>
+    <div class="card bulb">
+      <p><b>외울 것 세 줄</b></p>
+      <ol>
+        <li>30AT 송신선에 30BT 접점이 들어 있다.</li>
+        <li>30A·30B 어디가 점유돼도 30AT가 떨어진다.</li>
+        <li>30AT가 떨어져 있으면 30BT부터 본다.</li>
+      </ol>
+      <p class="def">국제 표준 IEC 60050-821(821-03-26) “cut section of track circuit”: 옆 궤도회로 계전기의 여자 접점을 통해 전원을 받는 궤도회로. 30BT 경계에는 신호기가 없습니다(미국 49 CFR §236.736: 신호기 위치가 아닌 곳의 궤도회로 경계).</p>
+    </div>
+  </section>
+
+  <h2>고장이 나면?</h2>
+  <section class="card">
+    <p style="margin:0 0 10px">고장 버튼을 눌러 보세요. 어떤 고장이든 결과는 <b>점유·정지</b> 쪽입니다. 고장이 나도 안전한 쪽으로 동작하는 것을 <b>페일세이프(Fail-safe)</b>라고 합니다.</p>
+    <details>
+      <summary>30AT 점검값 보기 (예시값)</summary>
+      <table>
+        <thead><tr><th>측정 위치</th><th>값</th><th>기준</th></tr></thead>
+        <tbody>
+          <tr><td>30AT 송신 출력</td><td class="v" id="mTx"></td><td class="meta">6.8~13.2V</td></tr>
+          <tr><td>30AT TU 입력 (4·5번)</td><td class="v" id="mTU"></td><td class="meta">기록값 대비</td></tr>
+          <tr><td>30AT 수신 입력</td><td class="v" id="mRx"></td><td class="meta">15mA 이상</td></tr>
+          <tr><td>30AT TR 전압</td><td class="v" id="mTR"></td><td class="meta">22.1~25.9V</td></tr>
+          <tr><td>30AT TPR 코일 (B24V)</td><td class="v" id="mTPR"></td><td class="meta">DC 24V</td></tr>
+        </tbody>
+      </table>
+      <p class="meta" style="margin:8px 0 0">30BT에 열차가 있을 때 TU 입력 0V는 정상입니다. 송신 출력은 정상인데 TU 입력이 없으면 30BT 접점이나 배선을 의심합니다.</p>
+    </details>
+  </section>
+
+  <h2>용어</h2>
+  <section class="card">
+    <dl>
+      <dt>AF</dt><dd>Audio Frequency, 사람이 들을 수 있는 대역의 주파수를 쓴다는 뜻</dd>
+      <dt>궤도회로</dt><dd>레일을 전기회로로 이용해 열차 위치를 감지하는 장치</dd>
+      <dt>점유 / 비점유</dt><dd>구간에 열차가 있음 / 없음</dd>
+      <dt>단락(Shunt)</dt><dd>열차 바퀴와 차축이 두 레일을 전기적으로 이어 주는 것</dd>
+      <dt>TR (궤도계전기)</dt><dd>현장에서 수신 결과에 따라 붙거나(여자) 떨어지는(낙하) 스위치</dd>
+      <dt>TPR</dt><dd>계전기실에서 TR의 상태를 그대로 따라 하는 계전기. 연동은 TPR 접점을 읽는다</dd>
+      <dt>중계궤도</dt><dd>옆 궤도(30BT) 계전기의 접점을 거쳐 송신하는 궤도(30AT). 두 구간을 하나처럼 묶는다</dd>
+      <dt>연동논리부 (EI)</dt><dd>궤도·신호 조건을 따져 신호와 표시를 정하는 장치</dd>
+      <dt>광통신부</dt><dd>연동의 정보를 광케이블로 다른 장치에 보내는 부분</dd>
+    </dl>
+  </section>
+
+  <p class="note">교육용 개념 모형입니다. 주파수는 TI21형 공칭주파수, 기준값은 AF궤도회로 유지보수 매뉴얼(K746-4-B207) 값이며, 측정값과 신호 현시, 30AT·30BT 결선과 표시 화면은 이해를 돕기 위한 예시로 실제 노선 설비와 다를 수 있습니다.</p>
+`;function Wt(u){u.innerHTML=`<div class="af">${jt}</div>`;const l=i=>u.querySelector("#"+i);let o=()=>{};const C="http://www.w3.org/2000/svg",e=l("track"),a=l("room"),d=40,g=230,T=150,w=170,z=200,N=185,ct=-T-20,K=1020,Y=[{name:"10T",freq:1699,type:"A",signal:!0},{name:"20T",freq:2296,type:"B",signal:!0},{name:"30AT",freq:1699,type:"A",signal:!0},{name:"30BT",freq:2296,type:"B",signal:!1}].map((i,n)=>({...i,i:n,x:d+n*g,level:100,tr:!0,tpr:!0,feed:!0})),nt=Y[0],Z=Y[1],E=Y[2],q=Y[3];let G=ct,rt=!1,lt=0,B=1,k=!0;const R={rail:!1,bt:!1,wire:!1,tpr:!1},Q=matchMedia("(prefers-reduced-motion: reduce)").matches,f=(i,n,m=e)=>{const H=document.createElementNS(C,i);for(const J in n)H.setAttribute(J,n[J]);return m.appendChild(H),H},b=(i,n,m=e)=>{const H=f("text",{fill:"currentColor",...n},m);return H.textContent=i,H};Y.forEach(i=>{i.bg=f("rect",{x:i.x+2,y:w-12,width:g-4,height:z-w+24,rx:6,opacity:.16}),b(i.name,{x:i.x+g/2,y:246,"text-anchor":"middle","font-size":22,"font-weight":600})}),[w,z].forEach(i=>f("line",{x1:0,y1:i,x2:1e3,y2:i,"stroke-width":5,"stroke-linecap":"round",class:"rail"})),Y.forEach(i=>{i.flowEl=f("path",{class:"flow",d:""})}),Y.forEach(i=>{i!==q&&b("RX",{x:i.x+12,y:w-20,"font-size":15,opacity:.7}),i!==E&&b("TX",{x:i.x+g-12,y:w-20,"font-size":15,"text-anchor":"end",opacity:.7})}),Y.filter(i=>i.signal).forEach(i=>{const n=i.x+8;f("line",{x1:n,y1:w-30,x2:n,y2:40,stroke:"currentColor","stroke-width":3,opacity:.5}),f("rect",{x:n-14,y:10,width:28,height:52,rx:8,fill:"#222"}),i.lampTop=f("circle",{cx:n,cy:24,r:8}),i.lampBot=f("circle",{cx:n,cy:48,r:8})}),f("line",{x1:q.x,y1:128,x2:q.x,y2:z+12,stroke:"var(--relay)","stroke-width":1.5,"stroke-dasharray":"3 4"});const M=f("g",{});f("rect",{x:576,y:96,width:94,height:30,rx:7,fill:"var(--card)",stroke:"currentColor","stroke-opacity":.35},M),b("30AT 송신",{x:623,y:116,"text-anchor":"middle",class:"sm","font-weight":600},M),f("path",{class:"wire",d:"M670 111 H684"},M),f("circle",{cx:686,cy:111,r:3.5,fill:"currentColor"},M),f("circle",{cx:712,cy:111,r:3.5,fill:"currentColor"},M);const V=f("line",{class:"blade",x1:686,y1:111,x2:712,y2:108},M);f("path",{class:"wire",d:`M714 111 H${E.x+g-12} V${w-3}`},M);const j=b("30BT 접점",{x:668,y:86,"text-anchor":"end",class:"sm",fill:"var(--relay)","font-weight":600},M),W=f("rect",{x:748,y:96,width:90,height:30,rx:7,fill:"var(--card)","stroke-width":2},M),ut=b("30BT TR",{x:793,y:116,"text-anchor":"middle",class:"sm","font-weight":600},M);f("path",{class:"wire",d:`M758 126 V${w-3}`},M);const et=f("path",{class:"ctl",d:"M793 96 V76 H699 V98"},M),ht=f("g",{});f("rect",{x:0,y:w-26,width:T,height:34,rx:10,fill:"var(--accent)"},ht),[20,50,T-50,T-20].forEach(i=>{f("circle",{cx:i,cy:w+12,r:7,fill:"currentColor"},ht),f("line",{x1:i,y1:w,x2:i,y2:z,stroke:"var(--warn)","stroke-width":3,"stroke-dasharray":"4 3"},ht)});const U=(i,n)=>b("✕",{x:i,y:n,"text-anchor":"middle","font-size":24,fill:"var(--occ)",visibility:"hidden","font-weight":700}),mt=U(Z.x+g/2,w+8),I=U(q.x+g-18,152),h=U(E.x+g-12,146);b("현장",{x:85,y:22,"text-anchor":"middle",class:"sm",opacity:.7},a),b("계전기실 (RR)",{x:300,y:22,"text-anchor":"middle",class:"sm",opacity:.7},a),f("line",{x1:160,y1:30,x2:160,y2:196,stroke:"currentColor",opacity:.35,"stroke-dasharray":"4 5"},a),Y.forEach((i,n)=>{const m=42+n*42;i.rTR=f("rect",{x:30,y:m-15,width:110,height:30,rx:7,fill:"var(--card)","stroke-width":2},a),b(i.name+" TR",{x:85,y:m+5,"text-anchor":"middle",class:"sm","font-weight":600},a),b("B24V",{x:172,y:m-6,class:"sm",opacity:.6,"font-size":11},a),f("circle",{cx:186,cy:m+4,r:3.5,fill:"currentColor"},a),f("path",{class:"wire",d:`M190 ${m+4} H204`},a),f("circle",{cx:206,cy:m+4,r:3,fill:"currentColor"},a),f("circle",{cx:230,cy:m+4,r:3,fill:"currentColor"},a),i.rBlade=f("line",{class:"blade",x1:206,y1:m+4,x2:230,y2:m+1},a),f("path",{class:"wire",d:`M232 ${m+4} H250`},a),i.rFlow=f("path",{class:"flow",d:`M190 ${m+4} H248`,"stroke-width":3},a),i.rTPR=f("rect",{x:250,y:m-15,width:110,height:30,rx:7,fill:"var(--card)","stroke-width":2},a),b(i.name+" TPR",{x:305,y:m+5,"text-anchor":"middle",class:"sm","font-weight":600},a),f("path",{class:"wire",d:`M360 ${m} H430`},a)});const L=b("✕",{x:241,y:136,"text-anchor":"middle","font-size":18,fill:"var(--occ)",visibility:"hidden","font-weight":700},a);f("rect",{x:430,y:26,width:130,height:158,rx:10,fill:"var(--card)",stroke:"currentColor","stroke-opacity":.35},a),b("연동논리부",{x:495,y:96,"text-anchor":"middle",class:"lbl"},a),b("(EI)",{x:495,y:116,"text-anchor":"middle",class:"sm",opacity:.7},a),b("TPR 접점을 읽음",{x:495,y:138,"text-anchor":"middle",class:"sm",opacity:.7},a),f("path",{class:"wire",d:"M560 92 H660"},a),f("circle",{cx:600,cy:92,r:4,fill:"currentColor"},a),f("path",{class:"wire",d:"M600 96 V146"},a),f("rect",{x:560,y:146,width:80,height:30,rx:7,fill:"var(--card)",stroke:"currentColor","stroke-opacity":.35},a),b("광통신부",{x:600,y:166,"text-anchor":"middle",class:"sm","font-weight":600},a),f("rect",{x:660,y:74,width:130,height:36,rx:7,fill:"var(--card)",stroke:"currentColor","stroke-opacity":.35},a),b("표시제어부",{x:725,y:97,"text-anchor":"middle",class:"sm","font-weight":600},a),f("path",{class:"wire",d:"M790 92 H860 V212"},a),f("rect",{x:30,y:212,width:940,height:78,rx:10,fill:"var(--board)"},a),b("표시 화면 (개념) · 빨강 = 점유",{x:48,y:234,class:"sm",fill:"var(--board-ink)"},a);const t=i=>70+(i-d)*(860/920);Y.forEach(i=>{i.seg=f("line",{x1:t(i.x)+6,y1:256,x2:t(i.x+g)-6,y2:256,"stroke-width":12,"stroke-linecap":"round"},a),b(i.name,{x:(t(i.x)+t(i.x+g))/2,y:282,"text-anchor":"middle",class:"sm",fill:"var(--board-ink)","font-weight":600},a)});const s=l("cards");Y.forEach(i=>{const n=document.createElement("div");n.className="card sec",n.innerHTML=`<h3>${i.name} <span class="badge">비점유</span></h3>
+      <div class="meta">${i.type}형 ${i.freq.toLocaleString()} Hz</div>
+      <div class="bar"><i></i></div>
+      <div class="meta lvl">수신 레벨 100%</div>
+      <div class="meta relay extra"></div>`,s.appendChild(n),i.card=n});const r=l("status"),p=l("pos");function A(i){return G+T>i.x&&G<i.x+g}function S(){const i=(H,J,tt)=>{H.feed=J,H.occT=A(H),H.broken=tt,H.level=!J||tt?0:H.occT?4:100,H.tr=H.level>=50};i(nt,!0,!1),i(Z,!0,R.rail),i(q,!R.bt,!1);const n=k?q.tr:!0,m=k?!R.wire:!0;return i(E,n&&m,!1),Y.forEach(H=>{H.tpr=H.tr&&!(H===E&&R.tpr)}),{contactClosed:n,wireOk:m}}function c(i){const n=[!nt.tpr,!Z.tpr,k?!E.tpr:!E.tpr||!q.tpr,!1];return n[i]?"R":n[i+1]?"Y":"G"}function $(){const i=S(),n="var(--free)",m="var(--occ)",H="var(--warn)",J="#3a3a3a";e.querySelectorAll(".rail").forEach(y=>y.setAttribute("stroke","var(--rail)")),Y.forEach(y=>{y.bg.setAttribute("fill",y.tpr?n:m);const dt=y.x+g-14;let bt=y.x+14;y.occT&&(bt=Math.min(dt,Math.max(bt,G+T-20))),y===Z&&R.rail&&(bt=Math.max(bt,y.x+g/2+12));const yt=y.feed&&bt<dt-4;y.flowEl.setAttribute("d",yt?`M${dt} ${N} H${bt}`:"");const Et=y.card.querySelector(".badge");Et.textContent=y.tpr?"비점유":"점유",Et.classList.toggle("occ",!y.tpr),y.card.querySelector(".bar").classList.toggle("low",y.level<50),y.card.querySelector(".bar>i").style.width=y.level+"%",y.card.querySelector(".lvl").textContent=`수신 ${y.level}% · TR ${y.tr?"여자":"낙하"} · TPR ${y.tpr?"여자":"낙하"}`;const Lt=Xt=>Xt?"var(--free)":"var(--occ)";y.rTR.setAttribute("stroke",Lt(y.tr)),y.rTPR.setAttribute("stroke",Lt(y.tpr));const zt=42+y.i*42;y.rBlade.setAttribute("x2",y.tr?230:226),y.rBlade.setAttribute("y2",y.tr?zt+1:zt-14),y.rBlade.setAttribute("stroke",y.tr?"currentColor":"var(--relay)"),y.rFlow.setAttribute("d",y.tpr?`M190 ${zt+4} H248`:""),y.seg.setAttribute("stroke",y.tpr?"var(--board-off)":"var(--occ)")}),E.card.classList.toggle("relayed",k),q.card.classList.toggle("relayed",k),E.card.querySelector(".extra").textContent=k?`송신 조건: 30BT 접점 ${i.contactClosed?"닫힘":"열림"}`:"중계 없음 (단독 궤도)",q.card.querySelector(".extra").textContent=k?`30AT 송신을 ${q.tr?"통과시킴":"끊음"}`:"",[nt,Z].forEach(y=>y.card.querySelector(".extra").textContent=""),Y.filter(y=>y.signal).forEach(y=>{const dt=c(y.i);y.lampTop.setAttribute("fill",dt==="R"?m:dt==="Y"?H:J),y.lampBot.setAttribute("fill",dt==="G"?n:J)});const tt=i.contactClosed;V.setAttribute("x2",tt?712:706),V.setAttribute("y2",tt?108:92),V.setAttribute("stroke",tt?"currentColor":"var(--relay)"),[V,j,et,W,ut].forEach(y=>y.setAttribute("visibility",k?"visible":"hidden")),W.setAttribute("stroke",q.tr?"var(--free)":"var(--occ)"),j.textContent=tt?"30BT 접점 닫힘":"30BT 접점 열림",ht.setAttribute("transform",`translate(${G},0)`),mt.setAttribute("visibility",R.rail?"visible":"hidden"),I.setAttribute("visibility",R.bt?"visible":"hidden"),h.setAttribute("visibility",k&&R.wire?"visible":"hidden"),L.setAttribute("visibility",R.tpr?"visible":"hidden"),p.value=Math.round((G-ct)/(K-ct)*1e3),l("mTx").textContent="9.6 V",l("mTU").textContent=E.feed?"9.1 V":"0.0 V",l("mRx").textContent=E.tr?"62 mA":E.feed?"4 mA":"0 mA",l("mTR").textContent=E.tr?"24.0 V":"0.0 V",l("mTPR").textContent=E.tpr?"24.0 V":"0.0 V";const vt=Y.filter(A).map(y=>y.name),it=[];vt.length&&it.push(`${vt.join(", ")}에 열차 — 차축이 레일을 단락시켜 수신 레벨이 떨어졌습니다.`),k&&q.occT&&!E.occT&&it.push("30AT에는 열차가 없지만 <b>30BT 접점이 열려 30AT 송신이 끊겼습니다(중계)</b>. 30AT도 점유가 되고, 30AT 신호기는 정지입니다."),!k&&q.occT&&E.tr&&it.push("중계가 없으면 30AT TR은 30BT 열차를 모릅니다. 그래서 연동이 30BT TPR까지 따로 읽어야 합니다."),R.rail&&it.push("20T는 레일 고장으로 열차가 없어도 ‘점유’입니다 (페일세이프)."),R.bt&&it.push(k?"30BT 송신 고장 → 30BT 낙하 → <b>접점이 열려 30AT까지 낙하</b>합니다. 30BT부터 점검하세요.":"30BT 송신 고장으로 30BT가 ‘점유’입니다."),k&&R.wire&&it.push("중계 배선 단선 → 송신 출력은 정상인데 30AT TU 입력이 0V입니다. 30BT 접점과 배선을 의심하세요."),R.tpr&&it.push("30AT TR은 정상인데 TPR이 낙하 → 연동은 점유로 봅니다. TR 접점부터 TPR까지 B24V 회로를 점검하세요."),it.length||it.push("모든 구간 비점유 — 수신기가 신호를 정상 수신 중입니다."),r.innerHTML=it.join(" ")}function F(i){if(!rt)return;const n=lt?Math.min(i-lt,50):16;lt=i,G+=n*.09*B*(Q?.5:1),G>K&&(G=ct),$(),requestAnimationFrame(F)}const x=l("play");function st(i){rt=i,lt=0,x.textContent=i?"❚❚ 일시정지":"▶ 운행 시작",i&&requestAnimationFrame(F)}x.onclick=()=>st(!rt),l("reset").onclick=()=>{G=ct,st(!1),$()},l("atStop").onclick=()=>{st(!1),G=E.x+40,$()},l("btStop").onclick=()=>{st(!1),G=q.x+40,$()},p.oninput=i=>{st(!1),G=ct+ +i.target.value/1e3*(K-ct),$()},l("speed").oninput=i=>B=+i.target.value;const _=l("mode");_.onclick=()=>{k=!k,_.setAttribute("aria-pressed",k),_.textContent=k?"🔗 중계 연결 켜짐":"⛓ 중계 연결 꺼짐 (비교)",l("fWire").disabled=!k,$()},[["fRail","rail"],["fBT","bt"],["fWire","wire"],["fTPR","tpr"]].forEach(([i,n])=>{const m=l(i);m.onclick=()=>{R[n]=!R[n],m.setAttribute("aria-pressed",R[n]),$()}});let pt=!1;const ft=()=>{document.hidden?(pt=rt,st(!1)):pt&&st(!0)};return document.addEventListener("visibilitychange",ft),o=()=>{st(!1),document.removeEventListener("visibilitychange",ft)},$(),()=>o()}const Ut=`  <h1>중계궤도는 왜 쓰나요?</h1>
+  <p class="sub">한 줄 요약: <b>궤도회로는 짧게 나눠야 믿을 수 있는데, 신호기는 그 단위마다 세울 수 없어서, 나눈 궤도를 계전기 접점으로 다시 하나로 묶습니다.</b></p>
+
+  <h2 class="why"><span class="step">1</span>궤도회로 하나는 길게 못 뽑는다</h2>
+  <section class="card">
+    <div class="scroll"><svg id="lenSvg" viewBox="0 0 1000 250" role="img" aria-label="구간 길이에 따라 수신 신호가 약해지는 그래프"></svg></div>
+    <div class="controls">
+      <label class="ctrl">구간 길이 <input id="lenR" type="range" min="200" max="2000" step="50" value="800"> <b id="lenV">800 m</b></label>
+      <span class="group">도상(자갈) 상태</span>
+      <button class="mode ballast" data-b="good" aria-pressed="true">좋음</button>
+      <button class="mode ballast" data-b="mid" aria-pressed="false">보통</button>
+      <button class="mode ballast" data-b="bad" aria-pressed="false">나쁨 (더러움·습기)</button>
+    </div>
+    <div class="status" id="lenStatus" aria-live="polite"></div>
+    <p class="meta" style="margin:8px 0 0">레일에는 저항이 있고, 두 레일 사이 자갈을 통해 전류가 조금씩 샙니다. 그래서 멀어질수록 신호가 약해집니다. AF 한 구간은 보통 600~1,000m(매뉴얼)이고, 미국 자료는 약 1.2km 이하로 제한한다고 합니다. 곡선과 퍼센트는 이해를 돕기 위한 개념 모형입니다.</p>
+  </section>
+
+  <h2 class="why"><span class="step">2</span>신호기 간격은 궤도회로 길이와 따로 정해진다</h2>
+  <section class="card">
+    <div class="scroll"><svg id="blkSvg" viewBox="0 0 1000 270" role="img" aria-label="1,800m 폐색구간을 궤도회로 하나로 덮지 못해 30AT와 30BT로 나누는 그림"></svg></div>
+    <p style="margin:10px 0 0">신호기와 신호기 사이(폐색구간)의 길이는 열차가 멈추는 데 필요한 거리 같은 운전 조건으로 정해집니다. 그래서 폐색구간이 궤도회로 하나보다 길어질 수 있습니다. 레일은 둘로 나눠야 하는데, <b>나눈 지점에는 신호기가 없습니다.</b></p>
+    <p class="def">미국 49 CFR §236.736 Cut-section: 폐색구간 안에서, 신호기 위치가 아닌 곳에 두 궤도회로의 경계가 있는 지점.</p>
+  </section>
+
+  <h2 class="why"><span class="step">3</span>나눈 두 궤도를 하나로 묶는 것이 중계</h2>
+  <section class="two">
+    <div class="card">
+      <h3 style="margin:0 0 6px;font-size:1rem">중계 없이 나누기만 하면</h3>
+      <svg id="cmpA" viewBox="0 0 480 290" role="img" aria-label="중계 없이 연동이 30AT와 30BT를 따로 읽는 그림"></svg>
+      <div class="count">2<small>연동이 확인할 궤도 조건</small></div>
+      <p class="meta" style="margin:4px 0 0">30BT 상태를 신호기 쪽으로 따로 전해야 합니다.</p>
+    </div>
+    <div class="card" style="border-color:var(--relay)">
+      <h3 style="margin:0 0 6px;font-size:1rem">중계로 묶으면</h3>
+      <svg id="cmpB" viewBox="0 0 480 290" role="img" aria-label="30BT 접점이 30AT 송신을 끊어 30AT 하나로 두 구간을 대표하는 그림"></svg>
+      <div class="count" style="color:var(--relay)">1<small>30AT 하나만 보면 됨</small></div>
+      <p class="meta" style="margin:4px 0 0">30BT 상태가 접점을 통해 30AT로 넘어옵니다.</p>
+    </div>
+  </section>
+  <section class="card" style="margin-top:10px">
+    <ul class="benefits">
+      <li><span class="tag src">근거</span><b>30AT 하나로 30A·30B 전체를 판단합니다.</b> 계전기 접점 논리로 둘 이상의 cut section을 하나의 신호 블록으로 합칩니다(미국 궤도검지 자료).</li>
+      <li><span class="tag src">근거</span><b>표준 정의와 같습니다.</b> IEC 60050-821(821-03-26): 옆 궤도회로 계전기의 여자 접점을 통해 전원을 받는 궤도회로.</li>
+      <li><span class="tag int">해석</span><b>30BT 상태를 따로 보낼 회로가 줄어듭니다.</b> 궤도회로 자체가 상태를 넘겨주므로, 연동이 볼 조건도 하나로 줄어듭니다.</li>
+      <li><span class="tag int">해석</span><b>고장도 안전한 쪽입니다.</b> 30BT 쪽 어디가 고장 나도 접점이 열려 30AT까지 낙하하므로 결과는 정지입니다.</li>
+    </ul>
+  </section>
+
+  <h2 class="why"><span class="step">4</span>한계: 한 방향 선로에 맞다</h2>
+  <section class="card">
+    <div class="scroll"><svg id="dirSvg" viewBox="0 0 1000 120" role="img" aria-label="열차 진행 방향이 한쪽으로 정해진 구조"></svg></div>
+    <p style="margin:8px 0 0">30BT가 30AT의 송신을 끊는 방향이 정해져 있고, 30AT 입구 신호기 하나가 두 구간을 지킵니다. 그래서 이 방식은 열차가 한 방향으로만 다니는 선로에 맞습니다(영문 위키백과). 양방향 운행 구간은 현장 설계를 확인해야 합니다.</p>
+  </section>
+
+  <h2>발표에서 이렇게 말하면 됩니다</h2>
+  <section class="card">
+    <p class="say">“궤도회로는 길이 한계 때문에 나눠야 하지만, 신호기는 폐색구간 단위로 하나라서, 나눈 궤도를 계전기 접점으로 다시 하나로 묶습니다. 그게 중계궤도입니다.”</p>
+    <a class="btnlink" href="#/m/af-track-circuit">① 시뮬레이터에서 직접 확인하기 →</a>
+  </section>
+
+  <p class="note">근거: 한국철도공사 AF궤도회로장치 유지보수 매뉴얼(K746-4-B207), IEC 60050-821, 미국 49 CFR §236.736·§236.737, JLC Enterprises “Track Occupancy Detection Fundamentals”, 영문 위키백과 “Track circuit”. 국내 매뉴얼에는 중계를 쓰는 이유가 직접 적혀 있지 않아, ‘해석’ 표시 항목은 회로 원리로 풀어 쓴 내용입니다. 폐색구간 1,800m와 그래프 수치는 예시입니다.</p>
+`;function Dt(u){u.innerHTML=`<div class="af">${Ut}</div>`;const l=h=>u.querySelector("#"+h);let o=()=>{};const C="http://www.w3.org/2000/svg",e=(h,L,t,s)=>{const r=document.createElementNS(C,L);for(const p in t)r.setAttribute(p,t[p]);return s!=null&&(r.textContent=s),h.appendChild(r),r},a=(h,L,t)=>e(h,"text",{fill:"currentColor",...t},L),d=l("lenSvg"),g=60,T=940,w=(T-g)/2e3,z=210,N=100,ct={good:950,mid:750,bad:500},K=30;let Y="good";[0,500,1e3,1500,2e3].forEach(h=>{e(d,"line",{x1:g+h*w,y1:z,x2:g+h*w,y2:z+6,stroke:"currentColor",opacity:.5}),a(d,`${h.toLocaleString()}m`,{x:g+h*w,y:z+22,"text-anchor":"middle",class:"sm",opacity:.7})}),e(d,"line",{x1:g,y1:z,x2:T,y2:z,stroke:"currentColor",opacity:.4}),e(d,"line",{x1:g+1e3*w,y1:24,x2:g+1e3*w,y2:z,stroke:"var(--muted)","stroke-dasharray":"3 5"}),a(d,"AF 한 구간 보통 ≈1,000m",{x:g+1e3*w+8,y:36,class:"sm",fill:"var(--muted)"});const nt=z-K/100*N;e(d,"line",{x1:g,y1:nt,x2:T,y2:nt,stroke:"var(--occ)","stroke-dasharray":"6 5","stroke-width":1.5}),a(d,"수신 최소선 (이보다 약하면 판단이 흔들림)",{x:T,y:nt-6,"text-anchor":"end",class:"sm",fill:"var(--occ)"}),a(d,"TX",{x:g,y:30,"text-anchor":"middle",class:"sm","font-weight":700});const Z=e(d,"line",{x1:g,y1:52,x2:g,y2:52,stroke:"var(--rail)","stroke-width":5,"stroke-linecap":"round"}),E=e(d,"line",{x1:g,y1:70,x2:g,y2:70,stroke:"var(--rail)","stroke-width":5,"stroke-linecap":"round"}),q=a(d,"RX",{y:30,"text-anchor":"middle",class:"sm","font-weight":700}),G=e(d,"path",{fill:"var(--flow)",opacity:.12}),rt=e(d,"path",{fill:"none",stroke:"var(--flow)","stroke-width":3}),lt=e(d,"circle",{r:7}),B=a(d,"",{class:"sm","font-weight":700});a(d,"수신 세기",{x:10,y:z-N-6,class:"sm",opacity:.7});function k(){const h=+l("lenR").value,L=ct[Y];l("lenV").textContent=`${h.toLocaleString()} m`;const t=g+h*w;Z.setAttribute("x2",t),E.setAttribute("x2",t),q.setAttribute("x",t);const s=[];for(let F=0;F<=h;F+=25)s.push([g+F*w,z-100*Math.exp(-F/L)/100*N]);const r=100*Math.exp(-h/L);s.push([t,z-r/100*N]);const p=s.map((F,x)=>(x?"L":"M")+F[0].toFixed(1)+" "+F[1].toFixed(1)).join(" ");rt.setAttribute("d",p),G.setAttribute("d",p+` L${t} ${z} L${g} ${z} Z`);const A=r>=K,S=z-r/100*N;lt.setAttribute("cx",t),lt.setAttribute("cy",S),lt.setAttribute("fill",A?"var(--free)":"var(--occ)"),B.textContent=`수신 ${Math.round(r)}%`;const c=t>820;B.setAttribute("x",c?t-12:t+12),B.setAttribute("y",S-10),B.setAttribute("text-anchor",c?"end":"start"),B.setAttribute("fill",A?"var(--free)":"var(--occ)");const $=l("lenStatus");$.className="status "+(A?"ok":"bad"),$.innerHTML=A?'<b style="color:var(--free)">수신 충분</b> — 이 길이면 궤도회로 하나로 열차 유무를 믿을 수 있습니다.':'<b style="color:var(--occ)">수신 부족</b> — 열차가 없는데도 점유로 나오는 오판이 생기고, 감도를 올려 버티면 반대로 열차를 놓칠 위험이 커집니다. <b>둘로 나눠야 합니다.</b>'}l("lenR").addEventListener("input",k),u.querySelectorAll(".ballast").forEach(h=>h.addEventListener("click",()=>{Y=h.dataset.b,u.querySelectorAll(".ballast").forEach(L=>L.setAttribute("aria-pressed",L===h)),k()})),k();const R=(h,L,t,s)=>{e(h,"line",{x1:L,y1:t+26,x2:L,y2:t+70,stroke:"currentColor","stroke-width":3,opacity:.5}),e(h,"rect",{x:L-11,y:t-16,width:22,height:42,rx:6,fill:"#222"}),e(h,"circle",{cx:L,cy:t-4,r:6,fill:"#3a3a3a"}),e(h,"circle",{cx:L,cy:t+14,r:6,fill:"var(--free)"})},Q=(h,L,t,s)=>{e(h,"line",{x1:L,y1:s,x2:t,y2:s,stroke:"var(--rail)","stroke-width":4,"stroke-linecap":"round"}),e(h,"line",{x1:L,y1:s+16,x2:t,y2:s+16,stroke:"var(--rail)","stroke-width":4,"stroke-linecap":"round"})},f=(h,L,t,s,r,p,A)=>{e(h,"rect",{x:L,y:t,width:s,height:r,rx:7,fill:"var(--card)",stroke:A||"currentColor","stroke-opacity":A?1:.4,"stroke-width":A?2:1}),a(h,p,{x:L+s/2,y:t+r/2+5,"text-anchor":"middle",class:"sm","font-weight":600})},b=l("blkSvg"),M=70,V=930,j=(V-M)/1800;R(b,M,34),R(b,V,34),e(b,"line",{x1:M+20,y1:30,x2:V-20,y2:30,stroke:"currentColor","stroke-width":1.2,"marker-start":"url(#ar0)","marker-end":"url(#ar0)"});const W=e(b,"defs",{}),ut=e(W,"marker",{id:"ar0",viewBox:"0 0 10 10",refX:5,refY:5,markerWidth:7,markerHeight:7,orient:"auto-start-reverse"});e(ut,"path",{d:"M0 0L10 5L0 10z",fill:"currentColor"}),a(b,"폐색구간 1,800m (예시) — 신호기와 신호기 사이",{x:500,y:22,"text-anchor":"middle",class:"sm","font-weight":600}),a(b,"궤도회로 하나로 덮으면",{x:M+20,y:92,class:"sm",opacity:.8}),Q(b,M,M+1e3*j,104),e(b,"rect",{x:M+1e3*j,y:98,width:V-M-1e3*j,height:28,fill:"var(--occ)",opacity:.14}),e(b,"line",{x1:M+1e3*j,y1:104,x2:V,y2:104,stroke:"var(--occ)","stroke-width":4,"stroke-dasharray":"6 6"}),e(b,"line",{x1:M+1e3*j,y1:120,x2:V,y2:120,stroke:"var(--occ)","stroke-width":4,"stroke-dasharray":"6 6"}),a(b,"≈1,000m까지만 믿을 수 있음",{x:M+500*j,y:146,"text-anchor":"middle",class:"sm",fill:"var(--free)","font-weight":600}),a(b,"여기는 신호가 약해 감지를 믿기 어려움",{x:M+1400*j,y:146,"text-anchor":"middle",class:"sm",fill:"var(--occ)","font-weight":600}),a(b,"그래서 둘로 나누면",{x:M+20,y:184,class:"sm",opacity:.8});const et=M+900*j;Q(b,M,et-4,196),Q(b,et+4,V,196),e(b,"rect",{x:M,y:190,width:et-M-4,height:28,fill:"var(--free)",opacity:.14}),e(b,"rect",{x:et+4,y:190,width:V-et-4,height:28,fill:"var(--free)",opacity:.14}),e(b,"line",{x1:et,y1:160,x2:et,y2:232,stroke:"var(--relay)","stroke-width":2,"stroke-dasharray":"4 4"}),a(b,"나눈 지점 · 신호기 없음",{x:et,y:172,"text-anchor":"middle",class:"sm",fill:"var(--relay)","font-weight":700}),a(b,"30AT (900m)",{x:(M+et)/2,y:254,"text-anchor":"middle",class:"lbl"}),a(b,"30BT (900m)",{x:(et+V)/2,y:254,"text-anchor":"middle",class:"lbl"});const ht=(h,L)=>{Q(h,30,237,232),Q(h,243,450,232),a(h,"30AT",{x:270/2,y:282,"text-anchor":"middle",class:"sm","font-weight":700}),a(h,"30BT",{x:690/2,y:282,"text-anchor":"middle",class:"sm","font-weight":700}),R(h,36,150),f(h,170,14,140,34,"연동 (EI)"),f(h,70,150,100,32,"30AT TR",L?"var(--relay)":null),e(h,"path",{class:"wire",d:"M120 182 V230"}),e(h,"path",{d:"M120 150 V90 H220 V50",fill:"none",stroke:"var(--flow)","stroke-width":3}),L?(f(h,300,150,100,32,"30BT TR"),e(h,"path",{class:"wire",d:"M350 182 V230"}),f(h,160,196,60,22,"송신"),e(h,"path",{class:"wire",d:"M220 207 H232 V230"}),e(h,"path",{class:"ctl",d:"M300 166 H262 V200"}),e(h,"circle",{cx:248,cy:207,r:3,fill:"var(--relay)"}),a(h,"30BT 접점",{x:268,y:140,class:"sm",fill:"var(--relay)","font-weight":700})):(f(h,300,150,100,32,"30BT TR"),e(h,"path",{class:"wire",d:"M350 182 V230"}),e(h,"path",{d:"M350 150 V90 H260 V50",fill:"none",stroke:"var(--flow)","stroke-width":3}),a(h,"따로 보내는 선",{x:360,y:84,class:"sm",fill:"var(--flow)","font-weight":600})),a(h,L?"연동은 30AT 하나만 읽음":"연동이 둘 다 읽어야 함",{x:240,y:128,"text-anchor":"middle",class:"sm",opacity:.8})};ht(l("cmpA"),!1),ht(l("cmpB"),!0);const U=l("dirSvg");Q(U,60,497,64),Q(U,503,940,64),R(U,66,36),a(U,"30AT",{x:280,y:112,"text-anchor":"middle",class:"sm","font-weight":700}),a(U,"30BT",{x:720,y:112,"text-anchor":"middle",class:"sm","font-weight":700});const mt=e(U,"defs",{}),I=e(mt,"marker",{id:"ar1",viewBox:"0 0 10 10",refX:9,refY:5,markerWidth:8,markerHeight:8,orient:"auto"});return e(I,"path",{d:"M0 0L10 5L0 10z",fill:"var(--accent)"}),e(U,"line",{x1:180,y1:24,x2:820,y2:24,stroke:"var(--accent)","stroke-width":3,"marker-end":"url(#ar1)"}),a(U,"열차 진행 방향 (한쪽으로 정해짐)",{x:500,y:15,"text-anchor":"middle",class:"sm",fill:"var(--accent)","font-weight":700}),e(U,"path",{class:"ctl",d:"M720 58 V50 H520 V58"}),a(U,"30BT가 30AT를 끊음",{x:620,y:44,"text-anchor":"middle",class:"sm",fill:"var(--relay)"}),()=>o()}const Zt=`  <h1>상선·하선 주파수 배치</h1>
+  <p class="sub">AF궤도회로는 선로마다 주파수 한 쌍을 정해 두고, 구간마다 번갈아 씁니다. 이웃 구간 사이 20m 동조구간에서 튜닝유니트가 두 주파수를 갈라 줍니다. 구간을 눌러 자세히 보세요.</p>
+
+  <section class="card">
+    <div class="controls" style="margin-top:0">
+      <button class="mode lay" data-lay="2" aria-pressed="true">복선 (상선·하선)</button>
+      <button class="mode lay" data-lay="4" aria-pressed="false">복복선 (4선)</button>
+      <button id="waveBtn" aria-pressed="true">〰 주파수 흐름 켜짐</button>
+    </div>
+    <div class="scroll" style="margin-top:10px"><svg id="lineSvg" viewBox="0 0 1000 260" role="img" aria-label="선로별 궤도회로 구간과 공칭주파수, 튜닝유니트, 동조구간 배치"></svg></div>
+    <div class="chips" id="chips"></div>
+    <div class="info" id="info" aria-live="polite"></div>
+    <p class="meta" style="margin:10px 0 0">동조구간(20m)은 잘 보이도록 실제보다 넓게 그렸습니다. 구간 길이는 600~1,000m 안에서 고른 예시이고, 흐르는 물결은 주파수를 눈으로 보이게 한 표현입니다(주파수가 높을수록 촘촘하고 빠르게).</p>
+  </section>
+
+  <h2>동조구간 확대 — 공진으로 두 주파수가 갈리는 20m</h2>
+  <section class="card">
+    <div class="scroll"><svg id="zoomSvg" viewBox="0 0 1000 330" role="img" aria-label="튜닝유니트의 공진 곡선과, 동조구간에서 A 주파수와 B 주파수가 서로 막혀 사라지는 그림"></svg></div>
+    <p style="margin:8px 0 0">튜닝유니트는 <b>공진</b>을 이용합니다. 라디오가 채널을 맞추면 그 방송만 또렷해지듯, 튜닝유니트는 자기 구간 주파수에서 가장 크게 반응하고(위 곡선의 봉우리), 다른 주파수에는 거의 반응하지 않습니다.</p>
+    <p style="margin:8px 0 0">그래서 A 신호는 동조구간을 지나며 약해지다가 B쪽 튜닝유니트 앞에서 막히고, B 신호도 A쪽 튜닝유니트 앞에서 막힙니다. 두 튜닝유니트 사이 <b>20m(±0.5m)</b>가 동조구간(전기적 분리 이음매)이고, 레일을 자르지 않고도 구간이 나뉘는 이유입니다.</p>
+    <p class="meta" style="margin:8px 0 0">공진 곡선의 모양과 물결이 줄어드는 모습은 원리를 보여 주기 위한 개념 표현입니다. 실제 튜닝유니트의 내부 회로와 특성값은 제조사 자료를 따릅니다.</p>
+  </section>
+
+  <h2>설명</h2>
+  <section class="two">
+    <div class="card">
+      <h3 style="margin:0 0 8px;font-size:1rem">공칭주파수 8종 (TI21형)</h3>
+      <table>
+        <thead><tr><th>선로</th><th>유형</th><th>공칭주파수</th></tr></thead>
+        <tbody>
+          <tr><td>하선 →</td><td>A · B</td><td class="v">1,699 · 2,296 Hz</td></tr>
+          <tr><td>상선 ←</td><td>C · D</td><td class="v">1,996 · 2,593 Hz</td></tr>
+          <tr><td>복복선 추가 →</td><td>E · F</td><td class="v">1,549 · 2,146 Hz</td></tr>
+          <tr><td>복복선 추가 ←</td><td>G · H</td><td class="v">1,848 · 2,445 Hz</td></tr>
+        </tbody>
+      </table>
+      <p class="meta" style="margin:8px 0 0">8종 모두 1,549~2,593Hz 안에 있습니다. 화살표 방향은 매뉴얼 주파수 분할도를 따랐습니다.</p>
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 8px;font-size:1rem">왜 이렇게 배치하나요?</h3>
+      <ul class="benefits">
+        <li><b>이웃 구간은 다른 주파수</b> — A → B → A → B처럼 번갈아 쓰면 붙어 있는 두 구간이 섞이지 않습니다. 수신기는 라디오 채널처럼 자기 주파수만 듣습니다.</li>
+        <li><b>선로마다 다른 쌍</b> — 하선은 A·B, 상선은 C·D를 써서 나란히 놓인 선로끼리도 같은 주파수가 겹치지 않습니다. 복복선은 E·F, G·H까지 씁니다.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 8px;font-size:1rem">튜닝유니트</h3>
+      <ul class="benefits">
+        <li>공진을 이용해 자기 주파수만 통과시키고, 구간을 전기적으로 나누는 이음매 역할을 합니다.</li>
+        <li>한 구간에 2대. 이웃 구간과 맞닿는 곳은 <b>일반형</b>, 구간이 끝나는 곳은 <b>종단형</b>을 씁니다.</li>
+        <li>단자: <b>1·2</b> 수신, <b>3</b> 접지, <b>4·5</b> 송신, <b>T1·T2</b> 레일.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 8px;font-size:1rem">구간 길이</h3>
+      <ul class="benefits">
+        <li>매뉴얼 구성도 기준 한 구간 <b>600~1,000m</b>, 이웃 구간과는 <b>20m</b> 동조구간.</li>
+        <li>정상 전력방식 <b>200~1,100m</b>, 짧은 구간용 저전력 방식 <b>50~250m</b>.</li>
+        <li>이보다 긴 구간은 나눠야 하고, 나눈 두 궤도를 묶을 때 중계궤도를 씁니다(② 페이지).</li>
+      </ul>
+    </div>
+  </section>
+  <p class="note">근거: 한국철도공사 AF궤도회로장치 유지보수 매뉴얼(K746-4-B207) 5.1 장치 설명·주파수 분할도·구성도. 그림의 구간 길이와 송신·수신 위치는 예시입니다.</p>
+`;function Qt(u){u.innerHTML=`<div class="af">${Zt}</div>`;const l=s=>u.querySelector("#"+s);let o=()=>{};const C="http://www.w3.org/2000/svg",e=(s,r,p,A)=>{const S=document.createElementNS(C,r);for(const c in p)S.setAttribute(c,p[c]);return A!=null&&(S.textContent=A),s.appendChild(S),S},a=(s,r,p)=>e(s,"text",{fill:"currentColor",...p},r),d={A:1699,B:2296,C:1996,D:2593,E:1549,F:2146,G:1848,H:2445},g=[{name:"하선",dir:1,pair:["A","B"],lens:[720,940,610,860,780]},{name:"상선",dir:-1,pair:["C","D"],lens:[880,650,990,700,830]},{name:"복복선 하선",dir:1,pair:["E","F"],lens:[640,820,900,760,690],quad:!0},{name:"복복선 상선",dir:-1,pair:["G","H"],lens:[930,700,760,880,620],quad:!0}],T=l("lineSvg"),w=150,z=985,N=14,ct=108,K=30;let Y=2,nt=!0,Z=null;const E=(s,r,p,A)=>{const S=30-(A-1549)/1044*14,c=4.5;let $=`M${s.toFixed(1)} ${p}`;for(let F=s;F<=r;F+=2)$+=` L${F.toFixed(1)} ${(p+c*Math.sin((F-s)/S*2*Math.PI)).toFixed(1)}`;return $},q=s=>(1.5-(s-1549)/1044*.8).toFixed(2)+"s";function G(){T.innerHTML="";const s=g.filter(x=>Y===4||!x.quad),r=K+s.length*ct+10;T.setAttribute("viewBox",`0 0 1000 ${r}`);const p=e(T,"defs",{}),A=e(p,"pattern",{id:"zoneHatch",width:6,height:6,patternUnits:"userSpaceOnUse",patternTransform:"rotate(45)"});e(A,"rect",{width:3,height:6,fill:"var(--zone)",opacity:.55});const S=[];s.forEach((x,st)=>{const _=K+st*ct+36,pt=_+26,ft=(_+pt)/2;a(T,x.name,{x:8,y:_+4,"font-size":15,"font-weight":700}),a(T,x.dir>0?"열차 →":"← 열차",{x:8,y:_+24,class:"sm",opacity:.7}),a(T,x.pair.join(" · "),{x:8,y:_+42,class:"sm","font-weight":700,fill:`var(--f${x.pair[0]})`});const i=x.lens.reduce((H,J)=>H+J,0),n=(z-w-N*(x.lens.length-1))/i;let m=w;x.lens.forEach((H,J)=>{const tt=x.pair[J%2],vt=d[tt],it=H*n,y=`var(--f${tt})`,dt=e(T,"g",{class:"seghit",tabindex:0,role:"button","aria-label":`${x.name} ${J+1}구간 ${tt}형 ${vt}Hz ${H}m`});e(dt,"rect",{class:"band",x:m,y:_-4,width:it,height:pt-_+8,rx:4,fill:y,"fill-opacity":.13}),nt?e(dt,"path",{class:"wave"+(x.dir>0?" rev":""),d:E(m+6,m+it-6,ft,vt),stroke:y}).style.setProperty("--dur",q(vt)):e(dt,"path",{d:E(m+6,m+it-6,ft,vt),stroke:y,fill:"none","stroke-width":2,opacity:.5}),a(dt,`${tt} ${vt.toLocaleString()}Hz`,{x:m+it/2,y:_-12,"text-anchor":"middle",class:"sm","font-weight":700,fill:y}),a(dt,`${H.toLocaleString()}m`,{x:m+it/2,y:pt+22,"text-anchor":"middle",class:"sm",opacity:.75});const bt={L:x,i:J,t:tt,f:vt,m:H,g:dt,prev:J>0?x.pair[(J-1)%2]:null,next:J<x.lens.length-1?x.pair[(J+1)%2]:null,last:x.lens.length};dt.addEventListener("click",()=>rt(bt)),dt.addEventListener("keydown",yt=>{(yt.key==="Enter"||yt.key===" ")&&(yt.preventDefault(),rt(bt))}),S.push(bt),m+=it,J<x.lens.length-1&&(e(T,"rect",{x:m,y:_-2,width:N,height:pt-_+4,fill:"url(#zoneHatch)"}),[m-3,m+N+3].forEach(yt=>{e(T,"rect",{x:yt-4,y:_-18,width:8,height:12,rx:2,fill:"var(--card)",stroke:"currentColor","stroke-width":1.2}),e(T,"line",{x1:yt,y1:_-6,x2:yt,y2:_-1,stroke:"currentColor","stroke-width":1.2})}),m+=N)}),e(T,"line",{x1:w,y1:_,x2:z,y2:_,stroke:"var(--rail)","stroke-width":4,"stroke-linecap":"round"}),e(T,"line",{x1:w,y1:pt,x2:z,y2:pt,stroke:"var(--rail)","stroke-width":4,"stroke-linecap":"round"}),[w,z].forEach(H=>{e(T,"rect",{x:H-5,y:_-18,width:10,height:12,rx:2,fill:"var(--card)",stroke:"var(--zone)","stroke-width":1.6})})});const c=K-14;e(T,"rect",{x:w,y:c-9,width:8,height:12,rx:2,fill:"var(--card)",stroke:"currentColor","stroke-width":1.2}),a(T,"튜닝유니트",{x:w+14,y:c+1,class:"sm",opacity:.8}),e(T,"rect",{x:w+100,y:c-9,width:10,height:12,rx:2,fill:"var(--card)",stroke:"var(--zone)","stroke-width":1.6}),a(T,"종단형",{x:w+116,y:c+1,class:"sm",opacity:.8}),e(T,"rect",{x:w+180,y:c-9,width:14,height:12,fill:"url(#zoneHatch)"}),a(T,"동조구간 20m (확대 표시)",{x:w+200,y:c+1,class:"sm",opacity:.8});const $=new Set(s.flatMap(x=>x.pair));l("chips").innerHTML=Object.keys(d).map(x=>`<span class="chip${$.has(x)?"":" off"}"><i style="background:var(--f${x})"></i>${x} ${d[x].toLocaleString()}Hz</span>`).join("");const F=Z&&S.find(x=>x.L===Z.L&&x.i===Z.i);rt(F||S[1])}function rt(s){Z=s,T.querySelectorAll(".seghit").forEach(A=>A.classList.toggle("sel",A===s.g));const r=[...new Set([s.prev,s.next].filter(Boolean))].map(A=>`${A}형 ${d[A].toLocaleString()}Hz`).join(", "),p=(s.i===0?"종단형":"일반형")+" · "+(s.i===s.last-1?"종단형":"일반형");l("info").innerHTML=`
+      <div><small>선택한 구간</small><b>${s.L.name} ${s.i+1}구간</b></div>
+      <div><small>공칭주파수</small><b style="color:var(--f${s.t})">${s.t}형 ${s.f.toLocaleString()} Hz</b></div>
+      <div><small>구간 길이 (예시)</small><b>${s.m.toLocaleString()} m</b></div>
+      <div><small>양 끝 튜닝유니트</small><b>${p}</b></div>
+      <div style="grid-column:1/-1"><small>이웃 구간</small>${r?`${r} — 이웃과 주파수가 달라서 섞이지 않습니다.`:"없음"} ${s.i>0||s.i<s.last-1?"맞닿는 곳마다 20m 동조구간에서 갈립니다.":""}</div>`}u.querySelectorAll(".lay").forEach(s=>s.addEventListener("click",()=>{Y=+s.dataset.lay,u.querySelectorAll(".lay").forEach(r=>r.setAttribute("aria-pressed",r===s)),G()}));const lt=l("waveBtn");lt.addEventListener("click",()=>{nt=!nt,lt.setAttribute("aria-pressed",nt),lt.textContent=nt?"〰 주파수 흐름 켜짐":"〰 주파수 흐름 꺼짐",G()}),G();const B=l("zoomSvg"),k=380,R=620,Q=178,f=212,b=195,M=e(B,"defs",{}),V=e(M,"linearGradient",{id:"wallG",x1:0,x2:1,y1:0,y2:0});e(V,"stop",{offset:"0","stop-color":"var(--zone)","stop-opacity":0}),e(V,"stop",{offset:"0.5","stop-color":"var(--zone)","stop-opacity":.55}),e(V,"stop",{offset:"1","stop-color":"var(--zone)","stop-opacity":0});const j=(s,r,p,A,S)=>{const c=30-(A-1549)/1044*14,$=6;let F="";for(let x=s;x<=r;x+=2){const st=p+$*S(x)*Math.sin((x-s)/c*2*Math.PI);F+=(F?" L":"M")+x.toFixed(1)+" "+st.toFixed(2)}return F},W=s=>s<=0?0:s>=1?1:s*s*(3-2*s),ut=s=>s<=k?1:s<=R?1-.93*W((s-k)/(R-k)):.07*Math.exp(-(s-R)/14),et=s=>s>=R?1:s>=k?1-.93*W((R-s)/(R-k)):.07*Math.exp(-(k-s)/14);e(B,"rect",{x:k,y:Q-8,width:R-k,height:f-Q+16,rx:4,fill:"var(--zone)",opacity:.1}),e(B,"path",{class:"wave",d:j(30,R+70,b-6,d.A,ut),stroke:"var(--fA)"}).style.setProperty("--dur",q(d.A)),e(B,"path",{class:"wave rev",d:j(k-70,970,b+6,d.B,et),stroke:"var(--fB)"}).style.setProperty("--dur",q(d.B)),e(B,"line",{x1:24,y1:Q,x2:976,y2:Q,stroke:"var(--rail)","stroke-width":5,"stroke-linecap":"round"}),e(B,"line",{x1:24,y1:f,x2:976,y2:f,stroke:"var(--rail)","stroke-width":5,"stroke-linecap":"round"});const mt=(s,r,p,A,S)=>{e(B,"rect",{class:"glow",x:s-10,y:Q-14,width:20,height:f-Q+28,fill:"url(#wallG)"}),e(B,"circle",{class:"ring",cx:s,cy:b,r:16,fill:"none",stroke:r,"stroke-width":2.5}),e(B,"circle",{class:"ring d2",cx:s,cy:b,r:16,fill:"none",stroke:r,"stroke-width":2.5}),a(B,p,{x:S,y:f+30,"text-anchor":A,class:"sm","font-weight":700,fill:r})};mt(R,"var(--fA)","A는 여기서 막힘","start",R+12),mt(k,"var(--fB)","B는 여기서 막힘","end",k-12);const I=1450,h=2700,L=(s,r,p)=>{const S=s-95,c=20,$=62;e(B,"rect",{x:S,y:c-12,width:190,height:$+30,rx:8,fill:"var(--card)",stroke:"currentColor","stroke-opacity":.25});const F=ft=>S+12+(ft-I)/(h-I)*166,x=c+$,st=70;let _="";for(let ft=I;ft<=h;ft+=10){const i=1/(1+Math.pow((ft-d[r])/st,2));_+=(_?" L":"M")+F(ft).toFixed(1)+" "+(x-4-i*($-16)).toFixed(1)}e(B,"path",{d:_+` L${F(h)} ${x-4} L${F(I)} ${x-4} Z`,fill:`var(--f${r})`,opacity:.15}),e(B,"path",{d:_,fill:"none",stroke:`var(--f${r})`,"stroke-width":2.4}),e(B,"line",{x1:S+10,y1:x-4,x2:S+190-10,y2:x-4,stroke:"currentColor",opacity:.35});const pt=1/(1+Math.pow((d[p]-d[r])/st,2));e(B,"circle",{cx:F(d[r]),cy:x-4-($-16),r:4,fill:`var(--f${r})`}),e(B,"circle",{cx:F(d[p]),cy:x-4-pt*($-16),r:4,fill:`var(--f${p})`}),a(B,`공진: ${r} ${d[r].toLocaleString()}Hz`,{x:S+10,y:c+4,class:"sm","font-weight":700,fill:`var(--f${r})`}),a(B,`${p}에는 거의 반응 없음`,{x:S+190-10,y:x+12,"text-anchor":"end","font-size":11,opacity:.75}),e(B,"rect",{x:s-46,y:118,width:92,height:28,rx:7,fill:"var(--card)",stroke:`var(--f${r})`,"stroke-width":2}),a(B,"튜닝유니트",{x:s,y:137,"text-anchor":"middle",class:"sm","font-weight":700}),e(B,"line",{x1:s-8,y1:146,x2:s-8,y2:Q-2,stroke:"currentColor","stroke-width":1.6}),e(B,"line",{x1:s+8,y1:146,x2:s+8,y2:f-2,stroke:"currentColor","stroke-width":1.6})};L(k,"A","B"),L(R,"B","A");const t=e(M,"marker",{id:"zar",viewBox:"0 0 10 10",refX:5,refY:5,markerWidth:7,markerHeight:7,orient:"auto-start-reverse"});return e(t,"path",{d:"M0 0L10 5L0 10z",fill:"var(--zone)"}),e(B,"line",{x1:k+4,y1:278,x2:R-4,y2:278,stroke:"var(--zone)","stroke-width":1.6,"marker-start":"url(#zar)","marker-end":"url(#zar)"}),a(B,"동조구간 20m (±0.5m)",{x:500,y:300,"text-anchor":"middle",class:"lbl",fill:"var(--zone)"}),a(B,"A 1,699Hz 구간",{x:150,y:160,"text-anchor":"middle",class:"lbl",fill:"var(--fA)"}),a(B,"B 2,296Hz 구간",{x:850,y:160,"text-anchor":"middle",class:"lbl",fill:"var(--fB)"}),()=>o()}const Jt=`  <h1>임피던스본드 (B1·B2)</h1>
+  <p class="sub">한 줄 요약: <b>레일에는 신호전류와 귀선전류가 함께 흐릅니다. 임피던스본드는 두 전류를 ‘방향’으로 구별해서, 귀선전류는 통과시키고 신호전류는 구간 안에 가둡니다.</b> 이 페이지의 주인공은 소형인 <b>B2</b>입니다.</p>
+
+  <h2 class="why"><span class="step">1</span>레일 하나에 전류가 두 종류 흐른다</h2>
+  <section class="two">
+    <div class="card bulb" style="border-color:var(--flow)">
+      <p><b style="color:var(--flow)">신호전류 (AF)</b></p>
+      <p>송신기가 레일에 흘리는 <b>1,549~2,593Hz</b> 대역의 신호입니다. 두 레일에서 <b>서로 반대 방향</b>으로 오가며 열차를 찾습니다.</p>
+      <p style="margin:0"><b>구간 밖으로 새면</b> 이웃 구간 신호와 섞이므로, 구간 안에 가둬야 합니다.</p>
+    </div>
+    <div class="card bulb" style="border-color:var(--relay)">
+      <p><b style="color:var(--relay)">귀선전류</b></p>
+      <p>전차선에서 열차로 들어간 전류가 <b>레일을 타고 변전소로 돌아가는</b> 전류입니다. 두 레일에 <b>같은 방향</b>으로 흐릅니다.</p>
+      <p style="margin:0"><b>막으면 안 되고</b>, 끊김 없이 돌려보내야 합니다.</p>
+    </div>
+  </section>
+  <section class="card" style="margin-top:10px">
+    <ul class="benefits">
+      <li><span class="tag src">근거</span><b>귀선전류는 통과, 신호전류는 차단.</b> 임피던스본드는 귀선전류를 통과시키고 신호전류는 막아 자기 구간 밖으로 새지 않게 합니다. 크기에 따라 B1(대형)·B2(소형)로 나뉩니다.</li>
+      <li><span class="tag int">해석</span><b>같은 레일의 두 전류를 무엇으로 구별할까요?</b> 전류의 <b>방향</b>입니다. 두 레일에서 반대 방향이면 신호, 같은 방향이면 귀선입니다. 아래에서 직접 확인해 보세요.</li>
+    </ul>
+  </section>
+
+  <h2 class="why"><span class="step">2</span>본드가 길을 갈라 준다</h2>
+  <section class="card">
+    <div class="scroll"><svg id="bondSvg" viewBox="0 0 1000 340" role="img" aria-label="두 레일에 걸쳐 달린 임피던스본드. 귀선전류는 중성점으로 빠져나가고 신호전류는 막히는 개념도"></svg></div>
+    <div class="controls">
+      <span class="group">흐르는 전류</span>
+      <button class="mode bmode" data-m="ret" aria-pressed="false">귀선전류만</button>
+      <button class="mode bmode" data-m="sig" aria-pressed="false">신호전류만</button>
+      <button class="mode bmode" data-m="both" aria-pressed="true">둘 다</button>
+      <span class="group">본드 크기 비교</span>
+      <button class="mode bsize" data-s="B2" aria-pressed="true">B2 (소형)</button>
+      <button class="mode bsize" data-s="B1" aria-pressed="false">B1 (대형)</button>
+      <span class="group">고장 넣어 보기</span>
+      <button id="bFault" class="fault" aria-pressed="false">⚡ 중성점 접속 풀림 (예시)</button>
+    </div>
+    <div class="status" id="bondStatus" aria-live="polite"></div>
+    <div class="info" id="bondInfo"></div>
+    <p class="meta" style="margin:10px 0 0">두 레일 사이를 실제보다 넓게 그린 개념도입니다. 본드를 어디에 어떻게 접속하는지는 설비마다 다르므로 구성도를 따르세요. B1·B2는 크기만 다르게 그렸습니다.</p>
+  </section>
+
+  <h2 class="why"><span class="step">3</span>왜 귀선은 통과하고 신호는 막힐까</h2>
+  <section class="two">
+    <div class="card bulb">
+      <p><b>본드는 가운데에 중성점이 있는 코일입니다.</b> 코일의 위쪽 반과 아래쪽 반이 철심 하나를 함께 감고 있고, 위·아래 끝은 각각 한쪽 레일에 이어집니다.</p>
+      <p style="margin:0">전류는 코일 감긴 방향대로 철심에 자속(자기장)을 만듭니다. 위 반과 아래 반의 자속이 <b>서로 같은 방향이면 합쳐지고, 반대 방향이면 상쇄</b>됩니다.</p>
+    </div>
+    <div class="card bulb">
+      <p><b style="color:var(--relay)">귀선전류</b> — 양 끝으로 들어와 <b>가운데로 모입니다.</b> 위 반과 아래 반의 자속이 서로 반대여서 <b>상쇄</b>되고, 코일이 거의 없는 것처럼 지나갑니다. → 임피던스 <b>낮음</b></p>
+      <p style="margin:0"><b style="color:var(--flow)">신호전류</b> — 한쪽 끝으로 들어와 <b>반대쪽 끝으로 나가려</b> 합니다. 두 반의 자속이 <b>합쳐져</b> 코일이 강하게 버팁니다. → 임피던스 <b>높음</b></p>
+    </div>
+  </section>
+  <p class="def" style="margin-top:10px">위 설명은 일반적인 전기 원리로 풀어 쓴 개념 설명입니다(해석). 그림의 자속 화살표는 합쳐지는지 상쇄되는지를 보여 주려고 그린 표현입니다.</p>
+
+  <h2 class="why"><span class="step">4</span>주파수가 높을수록 신호는 더 막힌다</h2>
+  <section class="card">
+    <div class="scroll"><svg id="bzSvg" viewBox="0 0 1000 290" role="img" aria-label="주파수에 따라 달라지는 신호 방향 임피던스와 귀선 방향 임피던스의 개념 곡선"></svg></div>
+    <div class="controls">
+      <label class="ctrl">주파수 <input id="bzF" type="range" min="0" max="3000" step="10" value="1699"> <b id="bzFv">1,699 Hz</b></label>
+      <button class="bzp" data-f="60">전철 전원 (60Hz)</button>
+      <button class="bzp" data-f="1699">A 1,699Hz</button>
+      <button class="bzp" data-f="2296">B 2,296Hz</button>
+    </div>
+    <div class="status" id="bzStatus" aria-live="polite"></div>
+    <p class="meta" style="margin:8px 0 0">곡선은 ‘주파수가 높을수록 코일이 더 강하게 막는다’는 경향을 보여 주는 개념 곡선이며 실제 임피던스 값이 아닙니다. 60Hz는 예시이고 선로의 전원 방식에 따라 다릅니다.</p>
+  </section>
+
+  <h2 class="why"><span class="step">5</span>B1과 B2</h2>
+  <section class="two">
+    <div class="card">
+      <table>
+        <thead><tr><th>구분</th><th>크기</th><th>역할</th></tr></thead>
+        <tbody>
+          <tr><td><b>B1</b></td><td class="v">대형</td><td class="meta">귀선전류 통과 · 신호전류 차단</td></tr>
+          <tr><td><b style="color:var(--relay)">B2</b></td><td class="v">소형</td><td class="meta">귀선전류 통과 · 신호전류 차단</td></tr>
+        </tbody>
+      </table>
+      <p class="meta" style="margin:8px 0 0"><span class="tag src">근거</span>B1은 대형, B2는 소형입니다(매뉴얼 정리). 역할은 같고 크기가 다릅니다.</p>
+    </div>
+    <div class="card bulb">
+      <p><b>이 앱에 담지 않은 것</b></p>
+      <p style="margin:0">B1·B2 각각의 정격 전류, 임피던스 값, 어느 설비에 어느 것을 쓰는지는 확인된 자료가 없어 넣지 않았습니다. 설비 구성도와 유지보수 매뉴얼(K746-4-B207)을 확인하세요.</p>
+    </div>
+  </section>
+
+  <h2 class="why"><span class="step">6</span>점검할 때 보는 곳</h2>
+  <section class="card">
+    <ul class="benefits">
+      <li><span class="tag src">근거</span><b>임피던스본드 단자</b>가 풀리지 않았는지, 흙·자갈이 쓸려 넘어질 우려는 없는지 봅니다.</li>
+      <li><span class="tag src">근거</span><b>임피던스본드~레일 접속부</b>와 <b>튜닝유니트~레일 접속부</b>는 바깥에 노출되어 취약하니 확인합니다.</li>
+      <li><span class="tag src">근거</span><b>본드선·잠바선</b>이 빠지거나 풀리지 않았는지 봅니다.</li>
+      <li><span class="tag int">해석</span>위 ‘중성점 접속 풀림’처럼 접속이 풀리면 귀선전류가 갈 낮은 임피던스 길이 사라질 수 있습니다. 단자 체결을 보는 이유입니다.</li>
+    </ul>
+    <p style="margin:10px 0 0"><a class="btnlink" href="#/m/af-track-circuit">① 시뮬레이터로 돌아가기 →</a></p>
+  </section>
+
+  <h2>용어</h2>
+  <section class="card">
+    <dl>
+      <dt>임피던스</dt><dd>교류에 대한 저항. 주파수에 따라 달라진다</dd>
+      <dt>임피던스본드</dt><dd>두 레일에 걸쳐 달아 귀선전류는 통과시키고 신호전류는 막는 코일 장치</dd>
+      <dt>귀선전류</dt><dd>열차를 거쳐 레일을 타고 변전소로 돌아가는 전류</dd>
+      <dt>중성점</dt><dd>코일의 한가운데에서 뽑은 단자. 귀선전류가 모여 빠져나가는 곳</dd>
+      <dt>자속</dt><dd>철심 안을 지나는 자기장의 흐름. 같은 방향이면 합쳐지고 반대면 상쇄된다</dd>
+    </dl>
+  </section>
+
+  <p class="note">근거: 한국철도공사 AF궤도회로장치 유지보수 매뉴얼(K746-4-B207)을 바탕으로 정리한 내용(‘근거’ 표시)과, 코일 원리를 일반 전기 원리로 풀어 쓴 설명(‘해석’ 표시)으로 구성했습니다. 그림과 곡선은 이해를 돕기 위한 개념 모형이며 실제 설비와 다를 수 있습니다.</p>
+`,te="http://www.w3.org/2000/svg";function v(u,l,o={},C){const e=document.createElementNS(te,l);for(const a in o)e.setAttribute(a,String(o[a]));return C!==void 0&&(e.textContent=C),u.appendChild(e),e}const D=(u,l,o)=>v(u,"text",{fill:"currentColor",...o},l),gt=(u,l)=>u.setAttribute("visibility",l?"visible":"hidden");function St(u,l,o,C,e){const a=C>o?1:-1;v(u,"line",{x1:l,y1:o,x2:l,y2:C-a*8,stroke:e,"stroke-width":4,"stroke-linecap":"round"}),v(u,"path",{d:`M${l} ${C} L${l-6} ${C-a*11} L${l+6} ${C-a*11} Z`,fill:e})}function ee(u){u.innerHTML=`<div class="af">${Jt}</div>`;const l=n=>u.querySelector("#"+n),o=u.querySelector("#bondSvg"),C=80,e=280,a=180,d=520,g=68,T=940,w=640,z="var(--relay)",N="var(--flow)";v(o,"rect",{x:30,y:40,width:d-30,height:280,rx:8,fill:N,opacity:.05}),v(o,"rect",{x:d,y:40,width:970-d,height:280,rx:8,fill:"var(--rail)",opacity:.07}),D(o,"이 구간 안 (신호가 오가는 곳)",{x:275,y:30,"text-anchor":"middle",class:"sm",opacity:.8}),D(o,"이웃 쪽 (신호가 넘어오면 안 되는 곳)",{x:745,y:30,"text-anchor":"middle",class:"sm",opacity:.8}),[C,e].forEach(n=>v(o,"line",{x1:30,y1:n,x2:970,y2:n,stroke:"var(--rail)","stroke-width":6,"stroke-linecap":"round"})),D(o,"위 레일",{x:936,y:C-12,class:"sm",opacity:.6,"text-anchor":"end"}),D(o,"아래 레일",{x:936,y:e+24,class:"sm",opacity:.6,"text-anchor":"end"}),v(o,"path",{class:"wire",d:`M90 ${C} V${a-20} M90 ${a+20} V${e}`}),v(o,"rect",{x:50,y:a-20,width:80,height:40,rx:7,fill:"var(--card)",stroke:"currentColor","stroke-opacity":.4}),D(o,"송신(TX)",{x:90,y:a+5,"text-anchor":"middle",class:"sm","font-weight":600});const ct=v(o,"line",{class:"wire",x1:d,y1:C,x2:d,y2:a-g}),K=v(o,"line",{class:"wire",x1:d,y1:e,x2:d,y2:a+g}),Y=v(o,"line",{class:"wire",x1:d,y1:a,x2:T,y2:a}),nt=v(o,"line",{class:"wire",x1:700,y1:a,x2:T,y2:a,"stroke-dasharray":"3 6",opacity:.4});[C,e].forEach(n=>v(o,"circle",{cx:d,cy:n,r:5,fill:"currentColor"}));const Z=v(o,"g",{});v(Z,"path",{class:"bflow ret",d:`M170 ${C+9} H${d}`}),v(Z,"path",{class:"bflow ret",d:`M170 ${e-9} H${d}`});const E=v(Z,"path",{class:"bflow ret"}),q=v(Z,"path",{class:"bflow ret"}),G=v(Z,"path",{class:"bflow ret"});D(Z,"귀선전류 → 같은 방향",{x:170,y:C+38,class:"sm",fill:z,"font-weight":700}),D(Z,"귀선 → 변전소 방향",{x:T,y:a-12,"text-anchor":"end",class:"sm",fill:z,"font-weight":700});const rt=v(o,"g",{});v(rt,"circle",{class:"ring",cx:w,cy:a,r:18,fill:"none",stroke:"var(--occ)","stroke-width":2.5}),v(rt,"circle",{class:"ring d2",cx:w,cy:a,r:18,fill:"none",stroke:"var(--occ)","stroke-width":2.5});const lt=D(o,"✕",{x:670,y:a+9,"text-anchor":"middle","font-size":26,fill:"var(--occ)","font-weight":700}),B=v(o,"g",{});v(B,"path",{class:"bflow sig",d:`M90 ${C-9} H${d}`}),v(B,"path",{class:"bflow sig",d:`M${d} ${e+9} H90`}),v(B,"path",{class:"bflow sig dim",d:`M${d} ${C} V${C+28}`}),v(B,"path",{class:"bflow sig dim",d:`M${d} ${e} V${e-28}`}),[C,e].forEach(n=>{v(B,"circle",{class:"ring",cx:d,cy:n,r:16,fill:"none",stroke:N,"stroke-width":2.5}),v(B,"circle",{class:"ring d2",cx:d,cy:n,r:16,fill:"none",stroke:N,"stroke-width":2.5})}),D(B,"신호전류 ⇄ 반대 방향",{x:140,y:C-24,class:"sm",fill:N,"font-weight":700}),D(B,"✕ 여기서 막힘",{x:d+22,y:C-20,class:"sm",fill:N,"font-weight":700});const k=v(o,"g",{});v(k,"line",{x1:-24,y1:-74,x2:-24,y2:74,stroke:"currentColor","stroke-width":3,opacity:.65}),v(k,"line",{x1:-31,y1:-74,x2:-31,y2:74,stroke:"currentColor","stroke-width":3,opacity:.65});const R="a10 10 0 0 0 0 20 ".repeat(3);v(k,"path",{d:`M0 ${-g} ${R}`,fill:"none",stroke:"currentColor","stroke-width":2.4}),v(k,"path",{d:`M0 8 ${R}`,fill:"none",stroke:"currentColor","stroke-width":2.4}),v(k,"line",{x1:0,y1:-8,x2:0,y2:8,stroke:"currentColor","stroke-width":2.4}),v(k,"circle",{cx:0,cy:0,r:4.5,fill:"currentColor"});const Q=v(k,"g",{});v(Q,"path",{class:"bflow ret",d:`M0 ${-g} V-8`}),v(Q,"path",{class:"bflow ret",d:`M0 ${g} V8`});const f=v(k,"g",{});St(f,-56,-62,-10,z),St(f,-56,62,10,z),D(f,"✕",{x:-56,y:8,"text-anchor":"middle","font-size":20,fill:z,"font-weight":700}),D(f,"상쇄",{x:-56,y:-74,"text-anchor":"middle",class:"sm",fill:z,"font-weight":700});const b=v(k,"g",{});St(b,-92,-62,-4,N),St(b,-92,4,62,N),D(b,"합쳐짐",{x:-100,y:-74,"text-anchor":"middle",class:"sm",fill:N,"font-weight":700}),D(o,"중성점 (센터탭)",{x:d+16,y:a-10,class:"sm","font-weight":600});const M=D(o,"",{x:d+16,y:a+36,"font-size":16,"font-weight":700,fill:z});D(o,"두 레일에 걸쳐 단 코일",{x:d+16,y:a+56,class:"sm",opacity:.7});let V="both",j="B2",W=!1;function ut(){const n=j==="B1"?1:.76;k.setAttribute("transform",`translate(${d},${a}) scale(${n})`),ct.setAttribute("y2",String(a-g*n)),K.setAttribute("y2",String(a+g*n)),E.setAttribute("d",`M${d} ${C+9} V${a-g*n}`),q.setAttribute("d",`M${d} ${e-9} V${a+g*n}`),M.textContent=j==="B1"?"B1 임피던스본드 (대형)":"B2 임피던스본드 (소형)"}const et=l("bondInfo"),ht=l("bondStatus");function U(){const n=V!=="sig",m=V!=="ret";ut(),gt(Z,n),gt(Q,n),gt(f,n),gt(B,m),gt(b,m),gt(lt,W),gt(nt,W),gt(rt,W&&n),Y.setAttribute("x2",String(W?w:T)),G.setAttribute("d",`M${d} ${a} H${W?w:T}`);const H=V==="both"?"귀선 통과 · 신호 차단":n?"귀선전류 통과":"신호전류 차단",J=V==="both"?"방향마다 다름":n?"낮음 (자속 상쇄)":"높음 (자속 합쳐짐)";et.innerHTML=`
+      <div><small>선택한 본드</small><b>${j} · ${j==="B1"?"대형":"소형"}</b></div>
+      <div><small>전류의 운명</small><b>${W&&n?"귀선이 갈 곳 없음":H}</b></div>
+      <div><small>코일 임피던스</small><b>${J}</b></div>
+      <div><small>중성점 접속</small><b style="color:var(--${W?"occ":"free"})">${W?"풀림 (예시)":"연결됨"}</b></div>`;let tt;W&&n?tt=`<b style="color:var(--occ)">중성점 접속이 풀렸습니다(예시).</b> 귀선전류가 모여 빠져나갈 낮은 임피던스 길이 사라집니다. ${m?"신호전류는 이 고장과 상관없이 여전히 막혀 있습니다. ":""}점검에서 <b>임피던스본드 단자 체결</b>을 확인하는 이유입니다.`:V==="both"?tt='<b>두 전류가 같은 레일에 섞여 있어도</b> 본드는 방향으로 구별합니다. 귀선전류(같은 방향)는 <b style="color:var(--relay)">중성점으로 빠져나가고</b>, 신호전류(반대 방향)는 <b style="color:var(--flow)">구간 밖으로 새지 못합니다.</b>':n?tt="귀선전류는 두 레일에서 <b>같은 방향</b>으로 흘러 본드 양 끝으로 들어와 중성점으로 모입니다. 위·아래 반쪽 코일의 자속이 서로 <b>상쇄</b>되어 코일이 거의 없는 것처럼 지나갑니다.":tt="신호전류는 두 레일에서 <b>반대 방향</b>이라 코일을 끝에서 끝까지 가로지르려 합니다. 두 반쪽 코일의 자속이 <b>합쳐져</b> 임피던스가 크고, 신호는 본드를 지나지 못해 구간 안에 갇힙니다.",j==="B2"&&(tt+=' <span class="meta">(B2는 소형, B1은 대형 — 이 그림은 크기만 다르게 그렸습니다.)</span>'),ht.innerHTML=tt,ht.className="status "+(W&&n?"bad":"ok")}u.querySelectorAll(".bmode").forEach(n=>n.addEventListener("click",()=>{V=n.dataset.m,u.querySelectorAll(".bmode").forEach(m=>m.setAttribute("aria-pressed",String(m===n))),U()})),u.querySelectorAll(".bsize").forEach(n=>n.addEventListener("click",()=>{j=n.dataset.s,u.querySelectorAll(".bsize").forEach(m=>m.setAttribute("aria-pressed",String(m===n))),U()}));const mt=l("bFault");mt.addEventListener("click",()=>{W=!W,mt.setAttribute("aria-pressed",String(W)),U()}),U();const I=u.querySelector("#bzSvg"),h=80,L=940,t=230,s=3e3,r=n=>h+n/s*(L-h),p=n=>1-Math.exp(-n/900),A=n=>t-180*p(n),S=n=>t-6-14*(n/s);v(I,"rect",{x:r(1549),y:40,width:r(2593)-r(1549),height:t-40,fill:"var(--zone)",opacity:.15}),D(I,"AF 신호 대역",{x:(r(1549)+r(2593))/2,y:140,"text-anchor":"middle",class:"sm",fill:"var(--zone)","font-weight":700}),D(I,"1,549~2,593Hz",{x:(r(1549)+r(2593))/2,y:158,"text-anchor":"middle",class:"sm",fill:"var(--zone)","font-weight":700}),v(I,"line",{x1:h,y1:t,x2:L,y2:t,stroke:"currentColor",opacity:.4}),v(I,"line",{x1:h,y1:36,x2:h,y2:t,stroke:"currentColor",opacity:.4}),D(I,"임피던스 (상대적 크기)",{x:h+8,y:30,class:"sm",opacity:.75});for(let n=0;n<=s;n+=500)v(I,"line",{x1:r(n),y1:t,x2:r(n),y2:t+6,stroke:"currentColor",opacity:.5}),D(I,n.toLocaleString(),{x:r(n),y:t+22,"text-anchor":"middle",class:"sm",opacity:.7});D(I,"주파수 (Hz)",{x:L,y:t+40,"text-anchor":"end",class:"sm",opacity:.7}),v(I,"line",{x1:r(60),y1:60,x2:r(60),y2:t,stroke:"var(--relay)","stroke-dasharray":"4 5",opacity:.8}),D(I,"전철 전원 (예: 60Hz)",{x:r(60)+8,y:76,class:"sm",fill:"var(--relay)","font-weight":700});const c=n=>{let m="";for(let H=0;H<=s;H+=30)m+=(m?" L":"M")+r(H).toFixed(1)+" "+n(H).toFixed(1);return m};v(I,"path",{d:c(A),fill:"none",stroke:N,"stroke-width":3.5}),v(I,"path",{d:c(S),fill:"none",stroke:z,"stroke-width":3.5}),D(I,"신호 방향 (반대 방향 전류)",{x:L,y:44,"text-anchor":"end",class:"sm",fill:N,"font-weight":700}),D(I,"귀선 방향 (같은 방향 전류)",{x:L,y:196,"text-anchor":"end",class:"sm",fill:z,"font-weight":700});const $=v(I,"line",{y1:36,y2:t,stroke:"currentColor","stroke-dasharray":"4 4",opacity:.55}),F=v(I,"circle",{r:8,fill:N,stroke:"var(--card)","stroke-width":2}),x=v(I,"circle",{r:8,fill:z,stroke:"var(--card)","stroke-width":2}),st=l("bzF"),_=l("bzFv"),pt=l("bzStatus"),ft=n=>n<.25?"낮음":n<.65?"중간":"높음";function i(){const n=+st.value,m=r(n);_.textContent=`${n.toLocaleString()} Hz`,$.setAttribute("x1",String(m)),$.setAttribute("x2",String(m)),F.setAttribute("cx",String(m)),F.setAttribute("cy",String(A(n))),x.setAttribute("cx",String(m)),x.setAttribute("cy",String(S(n)));const H=ft(p(n)),J=n>=1549&&n<=2593?"AF 신호 대역입니다. 신호는 크게 막혀 구간 안에 갇힙니다.":n<=150?"전철 전원 쪽의 낮은 주파수입니다. 본드가 귀선전류를 거의 막지 않고 통과시킵니다.":"이 주파수에서의 상대적 경향을 보여 줍니다.";pt.innerHTML=`<b>${n.toLocaleString()}Hz</b> — 신호(반대 방향) 임피던스 <b style="color:var(--flow)">${H}</b>, 귀선(같은 방향) 임피던스 <b style="color:var(--relay)">낮음</b>. ${J}`,pt.className="status ok"}return st.addEventListener("input",i),u.querySelectorAll(".bzp").forEach(n=>n.addEventListener("click",()=>{st.value=n.dataset.f,i()})),i(),()=>{}}const se=`  <h1>최종 정리 — 폐색, 한 장으로 보기</h1>
+  <p class="sub">지금까지 배운 것을 전부 한 선로 위에 올렸습니다. <b>폐색은 선로를 구간으로 나눠, 한 구간에 열차 하나만 들이는 약속</b>입니다. 느린 앞 열차가 A역에 설 때마다 빠른 뒤 열차가 따라붙지만, 궤도회로가 열차를 찾고 신호기가 간격을 지켜 줍니다.</p>
+
+  <section class="card">
+    <div class="scroll"><svg id="blockAll" viewBox="0 0 1000 352" role="img" aria-label="폐색 4개 구간과 A역, 신호기 4기, 두 열차, 관제 표시를 한 화면에 담은 종합 시뮬레이션"></svg></div>
+    <div class="controls">
+      <button id="aPlay" class="primary">▶ 운행 시작</button>
+      <button id="aReset">↺ 처음으로</button>
+      <label class="speed">속도 <input id="aSpeed" type="range" min="0.5" max="3" step="0.5" value="1"></label>
+      <span class="group">겹쳐 보기</span>
+      <button id="layFreq" class="mode" aria-pressed="true">주파수 보기 (③)</button>
+      <button id="layEq" class="mode" aria-pressed="false">경계 장비 보기 (③·④)</button>
+      <span class="group">고장 넣어 보기</span>
+      <button id="aF2" class="fault" aria-pressed="false">⚡ 2T 레일 고장</button>
+      <button id="aFB" class="fault" aria-pressed="false">⚡ 3BT 송신 고장 (중계)</button>
+    </div>
+    <div class="legend" id="aLegend" hidden>
+      <span><i style="background:var(--zone)"></i>동조구간 20m (③)</span>
+      <span>▭▭ 튜닝유니트 2대 (③)</span>
+      <span><b style="color:var(--relay)">B</b> 임피던스본드 (④)</span>
+    </div>
+    <div class="status" id="aStatus" aria-live="polite">‘운행 시작’을 눌러 보세요.</div>
+    <div class="info" id="aInfo"></div>
+    <p class="meta" style="margin:10px 0 0">선로 끝은 처음으로 이어지는 순환 모형이고, 구간 길이·3현시 방식·역 위치는 이해를 돕기 위한 예시입니다. 폐색 ③은 길어서 3AT·3BT로 나눈 뒤 중계로 묶었고(②), 구간 경계마다 동조구간·튜닝유니트(③)와 임피던스본드(④)가 있습니다.</p>
+  </section>
+
+  <h2>일어나는 일, 한 줄로</h2>
+  <section class="card">
+    <ul class="chain" id="aChain">
+      <li data-k="shunt">차축이 레일을 단락</li>
+      <li data-k="tr">TR 낙하 = 점유</li>
+      <li data-k="tpr">TPR → 연동 전달</li>
+      <li data-k="sig">뒤 신호가 정지·주의</li>
+      <li data-k="train">뒤 열차 서행·정지</li>
+    </ul>
+    <p class="meta" style="margin:12px 0 0">운행 중 지금 일어나고 있는 단계에 불이 들어옵니다. 앞 세 칸은 열차가 선로 위에 있는 한 항상 켜져 있습니다.</p>
+  </section>
+
+  <h2>다섯 페이지 정리</h2>
+  <section class="card">
+    <ul class="recap">
+      <li><a href="#/m/af-track-circuit"><b>① 궤도회로</b><span>차축이 레일을 단락하면 수신이 끊겨 ‘점유’. 고장도 점유 쪽 — 페일세이프.</span><span class="go">다시 보기 →</span></a></li>
+      <li><a href="#/m/af-track-circuit/2"><b>② 중계궤도</b><span>길어서 둘로 나눈 궤도를 계전기 접점으로 다시 하나로 묶는다.</span><span class="go">다시 보기 →</span></a></li>
+      <li><a href="#/m/af-track-circuit/3"><b>③ 주파수 배치</b><span>이웃 구간은 다른 주파수, 경계는 20m 동조구간에서 공진으로 갈라진다.</span><span class="go">다시 보기 →</span></a></li>
+      <li><a href="#/m/af-track-circuit/4"><b>④ 임피던스본드</b><span>귀선전류는 통과시키고 신호전류는 막아, 신호를 구간 안에 가둔다.</span><span class="go">다시 보기 →</span></a></li>
+      <li><a href="#/m/af-track-circuit/5"><b>⑤ 폐색 (이 페이지)</b><span>한 구간에 열차 하나. 점유를 찾고, 신호로 뒤 열차를 세운다.</span><span class="go">지금 보고 있어요</span></a></li>
+    </ul>
+  </section>
+
+  <h2>발표에서 이렇게 말하면 됩니다</h2>
+  <section class="card">
+    <p class="say">“폐색은 선로를 구간으로 나눠 한 구간에 열차 하나만 들이는 약속입니다. 궤도회로가 열차를 찾고, 중계·주파수·임피던스본드가 그 판단을 믿을 수 있게 만들고, 신호기가 뒤 열차를 세웁니다. 고장이 나면 정지 쪽으로 — 그래서 안전합니다.”</p>
+  </section>
+
+  <p class="note">①~④ 페이지의 근거(한국철도공사 K746-4-B207, IEC 60050-821, 미국 49 CFR §236.736 등)를 종합한 정리 페이지입니다. 그림의 구간 수·길이·현시 방식·역 위치는 교육용 예시이며, 실제 노선의 폐색 방식과 현시 체계는 선로별 규정을 따릅니다.</p>
+`,ae="http://www.w3.org/2000/svg";function P(u,l,o={},C){const e=document.createElementNS(ae,l);for(const a in o)e.setAttribute(a,String(o[a]));return C!==void 0&&(e.textContent=C),u.appendChild(e),e}const xt=(u,l,o)=>P(u,"text",{fill:"currentColor",...o},l),at=30,O=910,wt=156,$t=182,ot=O/4,Tt=ot*2.5,Mt=ot*3.5,kt=64,ne=26,Ct=[{name:"1T",s:0,e:ot,f:"A",hz:1699,block:0},{name:"2T",s:ot,e:ot*2,f:"B",hz:2296,block:1},{name:"3AT",s:ot*2,e:Tt,f:"A",hz:1699,block:2},{name:"3BT",s:Tt,e:ot*3,f:"B",hz:2296,block:2},{name:"4T",s:ot*3,e:O,f:"A",hz:1699,block:3}],Rt=[0,ot,ot*2,ot*3],Ft=["①","②","③","④"],re={run:"주행",caution:"서행",brake:"제동",stop:"정지",station:"정차"},le={run:"정상 주행",caution:"주의 — 서행",brake:"정지 현시 접근 — 제동",stop:"정지 현시 앞 대기",station:"A역 정차 중"},ie={run:"var(--free)",caution:"var(--warn)",brake:"var(--warn)",stop:"var(--occ)",station:"var(--accent)"},qt={R:"var(--occ)",Y:"var(--warn)",G:"var(--free)"};function oe(u){u.innerHTML=`<div class="af">${se}</div>`;const l=t=>u.querySelector("#"+t),o=u.querySelector("#blockAll"),C=matchMedia("(prefers-reduced-motion: reduce)").matches,e=P(o,"defs",{}),a=P(e,"pattern",{id:"zh5",width:6,height:6,patternUnits:"userSpaceOnUse",patternTransform:"rotate(45)"});P(a,"rect",{width:3,height:6,fill:"var(--zone)",opacity:.6});const d=Ct.map(t=>P(o,"rect",{x:at+t.s+2,y:126,width:t.e-t.s-4,height:62,rx:5,opacity:.15,fill:"var(--free)"}));for(let t=0;t<4;t++){const s=at+t*ot+16,r=at+(t+1)*ot-10;P(o,"path",{d:`M${s} 27 V22 H${r} V27`,fill:"none",stroke:"currentColor",opacity:.45,"stroke-width":1.4}),xt(o,`폐색 ${Ft[t]}`,{x:(s+r)/2,y:16,"text-anchor":"middle",class:"sm","font-weight":700,opacity:.75})}P(o,"rect",{x:at+Mt-58,y:96,width:116,height:9,rx:3,fill:"var(--muted)",opacity:.55}),xt(o,"A역",{x:at+Mt,y:90,"text-anchor":"middle",class:"sm","font-weight":700,opacity:.8}),[wt,$t].forEach(t=>P(o,"line",{x1:at,y1:t,x2:at+O,y2:t,stroke:"var(--rail)","stroke-width":5,"stroke-linecap":"round"})),P(o,"line",{x1:at+Tt,y1:108,x2:at+Tt,y2:188,stroke:"var(--relay)","stroke-width":1.5,"stroke-dasharray":"4 4",opacity:.8}),P(o,"rect",{x:at+Tt-32,y:86,width:64,height:22,rx:11,fill:"var(--relay)"}),xt(o,"중계",{x:at+Tt,y:101,"text-anchor":"middle","font-size":13,"font-weight":700,fill:"#fff"});const g=P(o,"g",{});Ct.forEach(t=>{const s=at+(t.s+t.e)/2;xt(o,t.name,{x:s,y:222,"text-anchor":"middle","font-size":15,"font-weight":700}),P(g,"rect",{x:at+t.s+8,y:206,width:t.e-t.s-16,height:3.5,rx:1.75,fill:`var(--f${t.f})`,opacity:.55}),xt(g,`${t.f} ${t.hz.toLocaleString()}Hz`,{x:s,y:238,"text-anchor":"middle","font-size":12,"font-weight":700,fill:`var(--f${t.f})`})});const T=P(o,"g",{visibility:"hidden"});[ot,ot*2,Tt,ot*3].forEach(t=>{const s=at+t;P(T,"rect",{x:s-5,y:wt+2,width:10,height:$t-wt-4,fill:"url(#zh5)"}),[s-15,s+7].forEach(r=>{P(T,"rect",{x:r,y:wt-18,width:8,height:12,rx:2,fill:"var(--card)",stroke:"currentColor","stroke-width":1.2}),P(T,"line",{x1:r+4,y1:wt-6,x2:r+4,y2:wt-1,stroke:"currentColor","stroke-width":1.2})}),P(T,"rect",{x:s-8,y:$t+4,width:16,height:15,rx:4,fill:"var(--card)",stroke:"var(--relay)","stroke-width":1.6}),xt(T,"B",{x:s,y:$t+16,"text-anchor":"middle","font-size":10,"font-weight":700,fill:"var(--relay)"})});const w=Rt.map((t,s)=>{const r=at+t;return P(o,"line",{x1:r,y1:100,x2:r,y2:wt-2,stroke:"currentColor","stroke-width":3,opacity:.4}),P(o,"rect",{x:r-12,y:34,width:24,height:66,rx:7,fill:"#222"}),xt(o,"S"+(s+1),{x:r+16,y:44,class:"sm","font-weight":700,opacity:.7}),{R:P(o,"circle",{cx:r,cy:48,r:7}),Y:P(o,"circle",{cx:r,cy:66,r:7}),G:P(o,"circle",{cx:r,cy:84,r:7})}});P(o,"rect",{x:at,y:252,width:O,height:94,rx:10,fill:"var(--board)"}),xt(o,"관제 표시 (개념) · 빨강 = 점유 · ● = 신호 현시 · ▬ = 열차 위치",{x:at+16,y:274,"font-size":12,fill:"var(--board-ink)"});const z=t=>at+18+t*(O-36)/O,N=Ct.map(t=>(xt(o,t.name,{x:(z(t.s)+z(t.e))/2,y:334,"text-anchor":"middle","font-size":11.5,"font-weight":600,fill:"var(--board-ink)"}),P(o,"line",{x1:z(t.s)+9,y1:308,x2:z(t.e)-9,y2:308,"stroke-width":11,"stroke-linecap":"round"}))),ct=Rt.map(t=>P(o,"circle",{cx:z(t)+2,cy:308,r:5.5,stroke:"var(--board)","stroke-width":2})),K=[{t:540,vmax:.85,station:Mt,dwell:0,name:"앞 열차",color:"var(--accent)",state:"run",sig:"S4"},{t:140,vmax:1,station:-1,dwell:0,name:"뒤 열차",color:"var(--fC)",state:"run",sig:"S2"}],Y=K.map(t=>P(o,"rect",{x:0,y:290,width:16,height:7,rx:2,fill:t.color}));function nt(t){const s=P(o,"g",{});P(s,"rect",{x:-kt,y:120,width:kt,height:30,rx:9,fill:t}),[-56,-40,-24].forEach(p=>P(s,"rect",{x:p,y:127,width:11,height:9,rx:2,fill:"#fff",opacity:.85})),[-13,-27,-kt+13,-kt+27].forEach(p=>P(s,"circle",{cx:p,cy:153,r:5,fill:"currentColor"})),[-15,-kt+15].forEach(p=>P(s,"line",{x1:p,y1:wt,x2:p,y2:$t,stroke:"var(--warn)","stroke-width":3,"stroke-dasharray":"4 3"}));const r=xt(s,"",{x:-kt/2,y:114,"text-anchor":"middle","font-size":12.5,"font-weight":700,fill:t});return{g:s,label:r}}const Z=K.map(t=>{const s=nt(t.color),r=nt(t.color);return()=>{const p=at+(t.t%O+O)%O;s.g.setAttribute("transform",`translate(${p},0)`),r.g.setAttribute("transform",`translate(${p+O},0)`);const A=`${t.name} · ${re[t.state]}`;s.label.textContent=A,r.label.textContent=A}}),E={rail2:!1,bt:!1};let q=!1,G=0,rt=1,lt=0;const B=(t,s,r)=>{for(const p of[-O,0,O])if(t+p>s+.001&&t+p-kt<r-.001)return!0;return!1};function k(){const t=Ct.map(p=>K.some(A=>B(A.t,p.s,p.e))||p.name==="2T"&&E.rail2||p.name==="3BT"&&E.bt);t[3]&&(t[2]=!0);const s=[t[0],t[1],t[2]||t[3],t[4]],r=s.map((p,A)=>p?"R":s[(A+1)%4]?"Y":"G");return{occ:t,blocks:s,aspects:r}}function R(t,s){let r=O,p=0;return Rt.forEach((A,S)=>{let c=(A-t.t+O)%O;c<.001&&(c=O),c<r&&(r=c,p=S)}),{name:"S"+(p+1),asp:s[p],dist:r}}function Q(t,s,r){if(t.dwell>0&&(t.dwell-=s,t.state="station",t.dwell>0))return;const p=R(t,r);t.sig=p.name;const A=.085*rt*t.vmax*s*(C?.5:1);let S=A,c=!1;if(p.asp==="R"){const $=p.dist-ne;if($<=.6){t.state="stop";return}const F=Math.min(1,$/130);S=Math.min(A*F,$-.5),c=F<1}else p.asp==="Y"&&(S=A*.55);if(t.station>=0){const $=(t.station-t.t+O)%O;if($>.001&&$<=S){t.t=t.station,t.dwell=2600/rt,t.state="station";return}}t.t=(t.t+S)%O,t.state=c?"brake":p.asp==="Y"?"caution":"run"}const f=l("aStatus"),b=l("aInfo"),M=new Map;u.querySelectorAll("#aChain li").forEach(t=>M.set(t.dataset.k,t));function V(){const{occ:t,blocks:s,aspects:r}=k();d.forEach((c,$)=>c.setAttribute("fill",t[$]?"var(--occ)":"var(--free)")),w.forEach((c,$)=>{c.R.setAttribute("fill",r[$]==="R"?"var(--occ)":"#3a3a3a"),c.Y.setAttribute("fill",r[$]==="Y"?"var(--warn)":"#3a3a3a"),c.G.setAttribute("fill",r[$]==="G"?"var(--free)":"#3a3a3a")}),N.forEach((c,$)=>c.setAttribute("stroke",t[$]?"var(--occ)":"var(--board-off)")),ct.forEach((c,$)=>c.setAttribute("fill",qt[r[$]])),K.forEach((c,$)=>{!q&&c.state==="run"&&(c.sig=R(c,r).name),Y[$].setAttribute("x",String(z((c.t%O+O)%O)-8))}),Z.forEach(c=>c());const p=c=>Ft[Math.floor((c%O+O)%O/ot)];b.innerHTML=`
+      <div><small>신호 현시</small><b>${r.map((c,$)=>`S${$+1}<span style="color:${qt[c]}"> ●</span>`).join(" ")}</b></div>
+      ${K.map(c=>`<div><small>${c.name} (${c.sig} 방향)</small><b style="color:${ie[c.state]}">폐색 ${p(c.t)} · ${le[c.state]}</b></div>`).join("")}
+      <div><small>점유 폐색</small><b>${s.filter(Boolean).length} / 4</b></div>`,["shunt","tr","tpr"].forEach(c=>M.get(c).classList.add("on")),M.get("sig").classList.toggle("on",r.some(c=>c!=="G"));const A=M.get("train");A.classList.toggle("on",K.some(c=>c.state!=="run"&&c.state!=="station")),A.classList.toggle("stop",K.some(c=>c.state==="stop"));const S=[];E.rail2&&S.push("<b>2T 레일 고장</b> — 열차 없이도 2T가 점유되어 S2가 정지를 현시합니다. 고장이 나면 막는 쪽으로, 페일세이프입니다."),E.bt&&S.push("<b>3BT 송신 고장</b> — 중계 접점이 열려 3AT까지 함께 점유가 되고, S3 하나가 두 토막 전체를 지킵니다(② 중계궤도)."),K.forEach(c=>{c.state==="stop"?S.push(`<b>${c.name}</b>가 ${c.sig} 정지 현시 앞에서 대기합니다 — 앞 폐색이 빌 때까지 들어가지 않습니다.`):c.state==="station"?S.push(`<b>${c.name}</b>가 A역에 정차 중 — 그동안 폐색 ④가 점유라 S4는 정지입니다.`):q&&c.state==="brake"?S.push(`<b>${c.name}</b>가 ${c.sig} 앞에서 제동 중입니다.`):q&&c.state==="caution"&&S.push(`<b>${c.name}</b>는 주의(황색) 현시를 보고 서행하며, 다음 신호에 설 준비를 합니다.`)}),S.length||S.push(q?"모든 신호 진행 — 두 열차가 신호만 보고 스스로 한 폐색 이상 간격을 지킵니다. 이것이 폐색입니다.":"‘운행 시작’을 눌러 보세요. 빠른 뒤 열차가 느린 앞 열차를 따라붙지만, 신호가 간격을 지켜 줍니다."),f.innerHTML=S.join(" "),f.className="status "+(E.rail2||E.bt?"bad":"ok")}function j(t){if(!q)return;const s=G?Math.min(t-G,50):16;G=t;const{aspects:r}=k();K.forEach(p=>Q(p,s,r)),V(),lt=requestAnimationFrame(j)}const W=l("aPlay");function ut(t){q=t,G=0,W.textContent=t?"❚❚ 일시정지":"▶ 운행 시작",t?lt=requestAnimationFrame(j):cancelAnimationFrame(lt)}W.onclick=()=>ut(!q),l("aReset").onclick=()=>{ut(!1),K[0].t=540,K[1].t=140,K.forEach(t=>{t.state="run",t.dwell=0}),E.rail2=E.bt=!1,l("aF2").setAttribute("aria-pressed","false"),l("aFB").setAttribute("aria-pressed","false"),V()},l("aSpeed").oninput=t=>{rt=+t.target.value};const et=l("aF2"),ht=l("aFB");et.onclick=()=>{E.rail2=!E.rail2,et.setAttribute("aria-pressed",String(E.rail2)),V()},ht.onclick=()=>{E.bt=!E.bt,ht.setAttribute("aria-pressed",String(E.bt)),V()};const U=l("layFreq"),mt=l("layEq"),I=l("aLegend");U.onclick=()=>{const t=U.getAttribute("aria-pressed")!=="true";U.setAttribute("aria-pressed",String(t)),g.setAttribute("visibility",t?"visible":"hidden")},mt.onclick=()=>{const t=mt.getAttribute("aria-pressed")!=="true";mt.setAttribute("aria-pressed",String(t)),T.setAttribute("visibility",t?"visible":"hidden"),I.hidden=!t};let h=!1;const L=()=>{document.hidden?(h=q,ut(!1)):h&&(h=!1,ut(!0))};return document.addEventListener("visibilitychange",L),V(),()=>{ut(!1),document.removeEventListener("visibilitychange",L)}}const ce={id:"af-track-circuit",titleKey:"mod.af.title",descKey:"mod.af.desc",level:"beginner",pages:[{titleKey:"mod.af.p1.title",mount:Wt},{titleKey:"mod.af.p2.title",mount:Dt},{titleKey:"mod.af.p3.title",mount:Qt},{titleKey:"mod.af.p4.title",mount:ee},{titleKey:"mod.af.p5.title",mount:oe}]},Pt=[ce],de=[{id:"signal-block",titleKey:"mod.signal.title",descKey:"mod.signal.desc"},{id:"switch",titleKey:"mod.switch.title",descKey:"mod.switch.desc"},{id:"power",titleKey:"mod.power.title",descKey:"mod.power.desc"}];Ot("ko");const Bt=document.getElementById("app");let At=null;const he=["auto","light","dark"];function It(u){u==="auto"?document.documentElement.removeAttribute("data-theme"):document.documentElement.dataset.theme=u;try{localStorage.setItem("railsim.theme",u)}catch{}}function Nt(){try{return localStorage.getItem("railsim.theme")||"auto"}catch{return"auto"}}It(Nt());function pe(){Bt.innerHTML=`
+    <button class="skip" id="skip">${X("app.skip")}</button>
+    <header class="site-header">
+      <a class="brand" href="#/"><span class="logo" aria-hidden="true">🚆</span>${X("app.name")}</a>
+      <div class="tools">
+        <label class="sr-only" for="lang">${X("nav.language")}</label>
+        <select id="lang">${Gt.map(l=>`<option value="${l.code}">${l.label}</option>`).join("")}</select>
+        <label class="sr-only" for="theme">${X("nav.theme")}</label>
+        <select id="theme">${he.map(l=>`<option value="${l}">${X(`theme.${l}`)}</option>`).join("")}</select>
+      </div>
+    </header>
+    <main id="main" tabindex="-1"></main>
+    <footer class="site-footer">${X("app.footer")}</footer>`,Bt.querySelector("#skip").onclick=()=>Bt.querySelector("#main").focus();const u=Bt.querySelector("#theme");return u.value=Nt(),u.onchange=()=>It(u.value),Bt.querySelector("#main")}function fe(u){return u.innerHTML=`
+    <section class="hero">
+      <h1>${X("home.title")}</h1>
+      <p class="lead">${X("app.tagline")}</p>
+    </section>
+    <p class="lead">${X("home.lead")}</p>
+    <ul class="module-list">
+      ${Pt.map(l=>`
+        <li><a class="module-card" href="#/m/${l.id}">
+          <span class="tag">${X(`home.level.${l.level}`)}</span>
+          <strong>${X(l.titleKey)}</strong>
+          <span>${X(l.descKey)}</span>
+          <span class="go">${X("home.open")} →</span>
+        </a></li>`).join("")}
+      ${de.map(l=>`
+        <li><div class="module-card soon" aria-disabled="true">
+          <span class="tag">${X("home.soon")}</span>
+          <strong>${X(l.titleKey)}</strong>
+          <span>${X(l.descKey)}</span>
+        </div></li>`).join("")}
+    </ul>`,()=>{}}function _t(){At==null||At(),At=null;const u=pe(),l=location.hash.match(/^#\/m\/([\w-]+)(?:\/(\d+))?/);if(!l){document.title=X("app.name"),At=fe(u);return}const o=Pt.find(w=>w.id===l[1]);if(!o){u.innerHTML=`<h1>${X("notfound.title")}</h1><p><a href="#/">${X("nav.home")}</a></p>`;return}const C=o.pages.length,e=Math.min(Math.max((Number(l[2])||1)-1,0),C-1),a=o.pages[e];document.title=`${X(a.titleKey)} · ${X("app.name")}`;const d=w=>w===0?`#/m/${o.id}`:`#/m/${o.id}/${w+1}`,g=()=>{const w=document.createElement("nav");w.className="pager",w.setAttribute("aria-label",X("nav.page",{n:e+1,total:C}));const z=e===0?`<a href="#/">← ${X("nav.home")}</a>`:`<a href="${d(e-1)}">${X("nav.prev")}</a>`,N=e<C-1?`<a class="next" href="${d(e+1)}">${X("nav.next")}</a>`:"<span></span>";return w.innerHTML=`${z}<span class="meta">${X("nav.page",{n:e+1,total:C})}</span>${N}`,w};u.appendChild(g());const T=document.createElement("div");u.appendChild(T),At=a.mount(T),u.appendChild(g()),window.scrollTo(0,0)}window.addEventListener("hashchange",_t);_t();
+
+</script>
+  <style>
+:root{--bg: #f4f6f5;--card: #ffffff;--ink: #1b2320;--muted: #5a6661;--line: #d8dedb;--rail: #6b7570;--free: #2f8f5b;--occ: #c8412f;--warn: #d49a1a;--accent: #1f6f8b;--hero-a: #1f6f8b;--hero-b: #16485c;--radius: 14px;color-scheme:light}@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg: #101412;--card: #1a201d;--ink: #e6ebe8;--muted: #9aa5a0;--line: #2c3531;--rail: #8a948f;--free: #4cbf80;--occ: #ef6a55;--warn: #e8b33a;--accent: #5bb3d1;--hero-a: #1d4d5e;--hero-b: #12303b;color-scheme:dark}}:root[data-theme=dark]{--bg: #101412;--card: #1a201d;--ink: #e6ebe8;--muted: #9aa5a0;--line: #2c3531;--rail: #8a948f;--free: #4cbf80;--occ: #ef6a55;--warn: #e8b33a;--accent: #5bb3d1;--hero-a: #1d4d5e;--hero-b: #12303b;color-scheme:dark}*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;background:var(--bg);color:var(--ink);line-height:1.6;font-family:system-ui,-apple-system,Apple SD Gothic Neo,Noto Sans KR,Malgun Gothic,sans-serif}a{color:var(--accent)}:focus-visible{outline:3px solid var(--accent);outline-offset:2px}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.skip{position:absolute;left:-999px;top:0;background:var(--card);padding:8px 12px;z-index:10}.skip:focus{left:8px;top:8px}.site-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px max(16px,env(safe-area-inset-left));border-bottom:1px solid var(--line);background:var(--card);position:sticky;top:0;z-index:5}.brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.15rem;color:var(--ink);text-decoration:none}.tools{display:flex;gap:8px}select{font:inherit;font-size:.9rem;padding:7px 8px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);min-height:40px}main{max-width:960px;margin:0 auto;padding:20px 16px 48px;outline:none}.site-footer{max-width:960px;margin:0 auto;padding:0 16px 32px;color:var(--muted);font-size:.8rem}h1{font-size:1.5rem;margin:0 0 6px;line-height:1.3}h2{font-size:1.1rem;margin:28px 0 10px}.lead{color:var(--muted);margin:0 0 18px}.back{display:inline-block;margin-bottom:12px;text-decoration:none;font-size:.95rem}.hero{background:linear-gradient(135deg,var(--hero-a),var(--hero-b));color:#fff;border-radius:18px;padding:28px 22px;margin-bottom:22px}.hero h1{font-size:1.8rem}.hero .lead{color:#ffffffd9;margin:0}.module-list{list-style:none;padding:0;margin:0;display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}.module-card{display:flex;flex-direction:column;gap:6px;height:100%;padding:16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);color:var(--ink);text-decoration:none;transition:transform .15s,border-color .15s}a.module-card:hover{border-color:var(--accent);transform:translateY(-2px)}.module-card strong{font-size:1.1rem}.module-card span{color:var(--muted);font-size:.92rem}.module-card .go{color:var(--accent);font-weight:600;margin-top:auto}.module-card.soon{opacity:.6;border-style:dashed}.module-card .tag{align-self:flex-start;font-size:.72rem!important;padding:2px 9px;border-radius:99px;background:var(--bg);border:1px solid var(--line)}@media(max-width:640px){.hero h1{font-size:1.5rem}}@media(prefers-reduced-motion:reduce){*{transition:none!important}}.pager{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px}.pager a{text-decoration:none;font-weight:600;padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);min-height:44px;display:inline-flex;align-items:center}.pager a.next{background:var(--accent);border-color:var(--accent);color:#fff}.pager:last-child{margin:28px 0 0}.af{--relay: #b8661a;--flow: #1f6f8b;--board: #16201c;--board-off: #4b5a54;--board-ink: #c9d3ce;--fA: #2b6cb0;--fB: #d97706;--fC: #7c3aed;--fD: #0f766e;--fE: #be185d;--fF: #4d7c0f;--fG: #9a3412;--fH: #64748b;--zone: #e8892a}@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .af{--relay: #e8a050;--flow: #5bb3d1;--board: #0b0f0d;--board-off: #3d4a44;--fA: #6ea8ff;--fB: #f5a524;--fC: #b794f6;--fD: #3cc8b4;--fE: #f472b6;--fF: #a3c95a;--fG: #f0905a;--fH: #a4b2c6;--zone: #f0a050}}:root[data-theme=dark] .af{--relay: #e8a050;--flow: #5bb3d1;--board: #0b0f0d;--board-off: #3d4a44;--fA: #6ea8ff;--fB: #f5a524;--fC: #b794f6;--fD: #3cc8b4;--fE: #f472b6;--fF: #a3c95a;--fG: #f0905a;--fH: #a4b2c6;--zone: #f0a050}.af .sub{color:var(--muted);margin:0 0 18px;font-size:.95rem}.af .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}.af svg{width:100%;height:auto;display:block}.af .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}@media(max-width:640px){.af #track,.af #room{min-width:640px}}.af .controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}.af button{font:inherit;font-size:.95rem;padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;min-height:42px}.af button:focus-visible,.af input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}.af button.primary{background:var(--accent);border-color:var(--accent);color:#fff}.af button.fault[aria-pressed=true]{background:var(--occ);border-color:var(--occ);color:#fff}.af button.mode[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff}.af label.speed{display:flex;align-items:center;gap:8px;font-size:.9rem;color:var(--muted);margin-left:auto}.af input[type=range]{accent-color:var(--accent)}.af .posrow{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:.9rem;color:var(--muted)}.af .posrow input{flex:1;min-width:0}.af .group{font-size:.8rem;font-weight:600;color:var(--muted);width:100%;margin-top:6px}.af .status{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--bg);font-size:.95rem}.af .status b{color:var(--relay)}.af .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}@media(max-width:640px){.af .grid{grid-template-columns:repeat(2,1fr)}.af label.speed{margin-left:0;width:100%}}.af .sec h3{margin:0 0 4px;font-size:1rem;display:flex;justify-content:space-between;align-items:center}.af .badge{font-size:.75rem;padding:2px 8px;border-radius:99px;color:#fff;background:var(--free)}.af .badge.occ{background:var(--occ)}.af .meta{font-size:.82rem;color:var(--muted)}.af .meta.relay{color:var(--relay);font-weight:600}.af .bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin:6px 0 2px}.af .bar>i{display:block;height:100%;background:var(--free);transition:width .2s}.af .bar.low>i{background:var(--occ)}.af .sec.relayed{border-color:var(--relay)}.af h2{font-size:1.1rem;margin:26px 0 10px}.af ol{padding-left:1.2em;margin:0}.af ol li{margin-bottom:6px}.af dl{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;font-size:.93rem}.af dt{font-weight:600}.af dd{margin:0;color:var(--muted)}.af .note{font-size:.8rem;color:var(--muted);margin-top:22px}.af .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:640px){.af .two{grid-template-columns:1fr}}.af .bulb{font-size:.95rem}.af .bulb p{margin:0 0 8px}.af table{width:100%;border-collapse:collapse;font-size:.9rem}.af th,.af td{text-align:left;padding:6px 4px;border-bottom:1px solid var(--line)}.af th{font-size:.8rem;color:var(--muted);font-weight:600}.af td.v{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}.af details summary{cursor:pointer;font-weight:600;font-size:.93rem}.af details[open] summary{margin-bottom:8px}.af .def{font-size:.85rem;color:var(--muted);border-left:3px solid var(--line);padding-left:10px;margin-top:8px}.af .lbl{font-size:16px;font-weight:600}.af .sm{font-size:13px}.af .flow{fill:none;stroke:var(--flow);stroke-width:4;stroke-dasharray:10 9;stroke-linecap:round;animation:run .6s linear infinite}@keyframes run{to{stroke-dashoffset:19}}.af .wire{fill:none;stroke:currentColor;stroke-width:2}.af .ctl{fill:none;stroke:var(--relay);stroke-width:1.6;stroke-dasharray:5 4}.af .blade{stroke-width:3.5;stroke-linecap:round}@media(prefers-reduced-motion:reduce){.af .flow{animation:none}.af .bar>i{transition:none}}.af .step{display:inline-flex;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-size:.9rem;align-items:center;justify-content:center;margin-right:8px;flex:none}.af h2.why{display:flex;align-items:center}.af label.ctrl{display:flex;align-items:center;gap:10px;font-size:.9rem;color:var(--muted);flex:1;min-width:240px}.af label.ctrl input{flex:1;min-width:0}.af label.ctrl b{color:var(--ink);font-variant-numeric:tabular-nums;min-width:64px;text-align:right}.af .status.ok{border-left:4px solid var(--free)}.af .status.bad{border-left:4px solid var(--occ)}.af .count{font-size:2rem;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}.af .count small{font-size:.85rem;font-weight:600;color:var(--muted);margin-left:6px}.af .tag{display:inline-block;font-size:.72rem;font-weight:700;padding:1px 7px;border-radius:99px;margin-right:6px;vertical-align:1px}.af .tag.src{background:var(--free);color:#fff}.af .tag.int{background:var(--relay);color:#fff}.af .benefits{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}.af .say{font-size:1.05rem;font-weight:600;border-left:4px solid var(--accent);padding:6px 12px;margin:0 0 12px}.af a.btnlink{display:inline-block;font-weight:600;text-decoration:none;color:#fff;background:var(--accent);padding:9px 14px;border-radius:10px}@media(max-width:640px){.af #lenSvg,.af #blkSvg{min-width:600px}}.af .wave{fill:none;stroke-width:2.6;stroke-linecap:round;stroke-dasharray:14 8;animation:wavego var(--dur,1s) linear infinite}.af .wave.rev{animation-direction:reverse}@keyframes wavego{to{stroke-dashoffset:-22}}.af .seghit{cursor:pointer}.af .seghit:focus-visible{outline:none}.af .seghit:focus-visible rect.band,.af .seghit.sel rect.band{stroke:currentColor;stroke-width:2}.af .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.af .chip{display:inline-flex;align-items:center;gap:6px;font-size:.82rem;padding:3px 9px;border-radius:99px;border:1px solid var(--line);background:var(--card)}.af .chip i{width:10px;height:10px;border-radius:50%;display:inline-block}.af .chip.off{opacity:.35}.af .info{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}@media(max-width:640px){.af .info{grid-template-columns:repeat(2,minmax(0,1fr))}.af #lineSvg{min-width:700px}.af #zoomSvg{min-width:560px}}.af .info div{background:var(--bg);border-radius:10px;padding:8px 10px;min-width:0}.af .info small{display:block;font-size:.75rem;color:var(--muted)}.af .info b{font-size:1.05rem;font-variant-numeric:tabular-nums}.af .ring{transform-box:fill-box;transform-origin:center;animation:ring 1.8s ease-out infinite}.af .ring.d2{animation-delay:.9s}@keyframes ring{0%{transform:scale(.35);opacity:.75}to{transform:scale(1.7);opacity:0}}.af .glow{animation:glow 1.8s ease-in-out infinite}@keyframes glow{50%{opacity:.25}}@media(prefers-reduced-motion:reduce){.af .wave,.af .ring,.af .glow{animation:none}.af .ring{opacity:.35}}.af .bflow{fill:none;stroke-width:4;stroke-dasharray:10 9;stroke-linecap:round;animation:run .6s linear infinite}.af .bflow.ret{stroke:var(--relay)}.af .bflow.sig{stroke:var(--flow)}.af .bflow.dim{opacity:.35}@media(max-width:640px){.af #bondSvg{min-width:720px}.af #bzSvg{min-width:600px}}@media(prefers-reduced-motion:reduce){.af .bflow{animation:none}}.af .chain{list-style:none;display:flex;flex-wrap:wrap;gap:14px 26px;padding:0;margin:12px 0 0}.af .chain li{position:relative;display:flex;align-items:center;padding:8px 15px;border-radius:99px;border:1.5px solid var(--line);background:var(--bg);font-size:.88rem;font-weight:600;color:var(--muted);transition:background .2s,border-color .2s,color .2s}.af .chain li.on{border-color:var(--accent);background:var(--accent);color:#fff}.af .chain li.on.stop{border-color:var(--occ);background:var(--occ)}.af .chain li:not(:last-child):after{content:"→";position:absolute;right:-21px;color:var(--muted);font-weight:700}.af .recap{list-style:none;padding:0;margin:0;display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(172px,1fr))}.af .recap li{margin:0}.af .recap a{display:flex;flex-direction:column;gap:6px;height:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);text-decoration:none;font-size:.88rem}.af .recap a:hover{border-color:var(--accent)}.af .recap a span{color:var(--muted)}.af .recap b{font-size:.95rem}.af .recap .go{color:var(--accent)!important;font-weight:700;margin-top:auto}.af .legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:.8rem;color:var(--muted)}.af .legend span{display:inline-flex;align-items:center;gap:5px}.af .legend i{display:inline-block;width:10px;height:10px;border-radius:3px}@media(max-width:640px){.af #blockAll{min-width:780px}}
+
+</style>
+</head>
+<body>
+  <div id="app"></div>
+</body>
+</html>
