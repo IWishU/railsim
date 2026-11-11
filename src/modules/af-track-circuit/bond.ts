@@ -116,7 +116,7 @@ export function mountBond(root: HTMLElement): () => void {
     wBot.setAttribute("y2", String(CY + LEAD * s));
     fTop.setAttribute("d", `M${BX} ${UY + 9} V${CY - LEAD * s}`);
     fBot.setAttribute("d", `M${BX} ${LY - 9} V${CY + LEAD * s}`);
-    bondName.textContent = size === "B1" ? "B1 임피던스본드 (대형)" : "B2 임피던스본드 (소형)";
+    bondName.textContent = size === "B1" ? "B1본드 (대형)" : "B2본드 (소형)";
   }
 
   const info = $("bondInfo"), status = $("bondStatus");
