@@ -23,21 +23,21 @@
 
   <h2 class="why"><span class="step">2</span>본드가 길을 갈라 준다</h2>
   <section class="card">
-    <div class="scroll"><svg id="bondSvg" viewBox="0 0 1000 340" role="img" aria-label="두 레일에 걸쳐 달린 임피던스본드. 귀선전류는 중성점으로 빠져나가고 신호전류는 막히는 개념도"></svg></div>
+    <div class="scroll"><svg id="bondSvg" viewBox="0 0 1000 340" role="img" aria-label="두 레일에 걸쳐 달린 B2본드. 귀선전류는 중성점으로 빠져나가고 신호전류는 막히는 개념도"></svg></div>
     <div class="controls">
       <span class="group">흐르는 전류</span>
       <button class="mode bmode" data-m="ret" aria-pressed="false">귀선전류만</button>
       <button class="mode bmode" data-m="sig" aria-pressed="false">신호전류만</button>
       <button class="mode bmode" data-m="both" aria-pressed="true">둘 다</button>
-      <span class="group">본드 크기 비교</span>
-      <button class="mode bsize" data-s="B2" aria-pressed="true">B2 (소형)</button>
-      <button class="mode bsize" data-s="B1" aria-pressed="false">B1 (대형)</button>
+      <span class="group">B1본드와 크기 비교</span>
+      <button class="mode bsize" data-s="B2" aria-pressed="true">B2본드 (소형)</button>
+      <button class="mode bsize" data-s="B1" aria-pressed="false">B1본드 (대형)</button>
       <span class="group">고장 넣어 보기</span>
       <button id="bFault" class="fault" aria-pressed="false">⚡ 중성점 접속 풀림 (예시)</button>
     </div>
     <div class="status" id="bondStatus" aria-live="polite"></div>
     <div class="info" id="bondInfo"></div>
-    <p class="meta" style="margin:10px 0 0">두 레일 사이를 실제보다 넓게 그린 개념도입니다. 본드를 어디에 어떻게 접속하는지는 설비마다 다르므로 구성도를 따르세요. B1·B2는 크기만 다르게 그렸습니다.</p>
+    <p class="meta" style="margin:10px 0 0">두 레일 사이를 실제보다 넓게 그린 개념도입니다. 본드를 어디에 어떻게 접속하는지는 설비마다 다르므로 구성도를 따르세요. B2본드·B1본드는 크기만 다르게 그렸습니다.</p>
   </section>
 
   <h2 class="why"><span class="step">3</span>왜 귀선은 통과하고 신호는 막힐까</h2>
