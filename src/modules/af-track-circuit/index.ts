@@ -14,5 +14,6 @@ export const afTrackCircuit: RailModule = {
     { titleKey: "mod.af.p1.title", mount: mountSim },
     { titleKey: "mod.af.p2.title", mount: mountWhy },
     { titleKey: "mod.af.p3.title", mount: mountLines },
+    { titleKey: "mod.af.p4.title", mount: mountBond },
   ],
 };
