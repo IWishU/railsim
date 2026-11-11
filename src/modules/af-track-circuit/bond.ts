@@ -97,7 +97,7 @@ export function mountBond(root: HTMLElement): () => void {
   const fluxRet = mk(gBond, "g", {});
   arrow(fluxRet, -56, -62, -10, RET); arrow(fluxRet, -56, 62, 10, RET);
   T(fluxRet, "✕", { x: -56, y: 8, "text-anchor": "middle", "font-size": 20, fill: RET, "font-weight": 700 });
-  T(fluxRet, "상쇄", { x: -56, y: 92, "text-anchor": "middle", class: "sm", fill: RET, "font-weight": 700 });
+  T(fluxRet, "상쇄", { x: -56, y: -74, "text-anchor": "middle", class: "sm", fill: RET, "font-weight": 700 });
   const fluxSig = mk(gBond, "g", {});
   arrow(fluxSig, -92, -62, -4, SIG); arrow(fluxSig, -92, 4, 62, SIG);
   T(fluxSig, "합쳐짐", { x: -100, y: 92, "text-anchor": "middle", class: "sm", fill: SIG, "font-weight": 700 });
