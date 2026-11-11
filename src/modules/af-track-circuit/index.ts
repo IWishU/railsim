@@ -3,6 +3,7 @@ import "./af.css";
 import { mountSim } from "./sim";
 import { mountWhy } from "./why";
 import { mountLines } from "./lines";
+import { mountBond } from "./bond";
 
 export const afTrackCircuit: RailModule = {
   id: "af-track-circuit",
