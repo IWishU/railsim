@@ -147,7 +147,7 @@ export function mountBond(root: HTMLElement): () => void {
     } else {
       msg = `신호전류는 두 레일에서 <b>반대 방향</b>이라 코일을 끝에서 끝까지 가로지르려 합니다. 두 반쪽 코일의 자속이 <b>합쳐져</b> 임피던스가 크고, 신호는 본드를 지나지 못해 구간 안에 갇힙니다.`;
     }
-    if (size === "B2") msg += ` <span class="meta">(B2는 소형, B1은 대형 — 이 그림은 크기만 다르게 그렸습니다.)</span>`;
+    if (size === "B2") msg += ` <span class="meta">(B2본드는 소형, B1본드는 대형 — 이 그림은 크기만 다르게 그렸습니다.)</span>`;
     status.innerHTML = msg;
     status.className = "status " + (fault && ret ? "bad" : "ok");
   }
